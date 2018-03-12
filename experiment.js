@@ -5,7 +5,6 @@ const rs10Color = 0xa35c10;
 const rs5Color = 0x25d1ae;
 const rsCoinColor = 0x707a77;
 const rsCoinWriteColor = 0x555b5a;
-
 var tenderWidth;
 var tenderHeight;
 var fontCurrency;
@@ -13,13 +12,9 @@ var fontBootStrap;
 var fontSpecific;
 var fontGeneral;
 var tenders;
-var tenderTextSize;
-var tenderTextHeight;
-var scaleDownInnerTender;
 var boardWidth
 var boardHeight
 var board;
-var bulb;
 var currentRotationBoard;
 var boardCurrentSpeed;
 var boardAcceleration;
@@ -33,7 +28,6 @@ var game3CheckBox;
 var displayingNow;
 var currentDisp;
 var hbNow;
-var stopped;
 var prevGame;
 
 // helper functions
@@ -49,14 +43,9 @@ function initialiseVariables(){
 	tenderWidth = 2;
 	tenderHeight = 1;
 	tenders = {};
-	tenderTextSize = 0.3;
-	tenderTextHeight = 0.1;
-	scaleDownInnerTender = 0.09;
 	boardWidth = 7;
 	boardHeight = 5;
-	stopped = true;
 	board = undefined;
-	bulb = undefined;
 	coinRadius = 0.4;
 	game1CheckBox = "Activity 1";
 	game2CheckBox = "Activity 2";
@@ -91,28 +80,8 @@ function addFonts(pathToFont){
 	textureLoader.load('./images/50p.png', function(response){
 		tenders['coin50p'] = {"img": drawCoin(response), "val": 0.50};
 	});
-	// currency font
     loader.load("./fonts/optimer.json", function(response){
 		fontCurrency = response;
-		// tender100 = drawTender("Rs 100", rs100Color);  
-		// tender50 = drawTender("Rs 50", rs50Color);
-		// tender20 = drawTender("Rs 20", rs20Color);
-		// tender10 = drawTender("Rs 10", rs10Color);
-		// tender5 = drawTender("Rs 5", rs5Color);
-		// coin2 = drawCoin("2");
-		// coin1 = drawCoin("1");
-		// coin50p = drawCoin("50p");
-		
-		// tenders['tender100'] = {"img": tender100, "val": 100};
-		// tenders['tender50'] = {"img": tender50, "val": 50};
-		// tenders['tender20'] = {"img": tender20, "val": 20};
-		// tenders['tender10'] = {"img": tender10, "val": 10};
-		// tenders['tender5'] = {"img": tender5, "val": 5};
-		// tenders['coin2'] = {"img": coin2, "val": 2};
-		// tenders['coin1'] = {"img": coin1, "val": 1};
-		// tenders['coin50p'] = {"img": coin50p, "val": 0.50};
-
-		// PIErender();
 	});
 
 	loader.load("./fonts/gentilis.json", function (response){
@@ -143,7 +112,6 @@ function handleCheckChange1(){
 		return;
 	}
 	beforeChangeGame();
-	// console.log("current game value: " + documet.getElementById(game1CheckBox).checked);
 	currentGame = 1;
 	notifyChangeGame();
 }
@@ -169,7 +137,6 @@ function handleCheckChange3(){
 }
 
 function beforeChangeGame(){
-	// if(curren)
 	if(currentGame == 1){
 		removeBoxesGame1();
 	} else if(currentGame == 2){
@@ -205,10 +172,6 @@ function runBootStrap(){
 	board = new THREE.Group();
 	let greenBoardGeometry = new THREE.BoxGeometry(boardWidth, boardHeight, 0.2);
 	new THREE.TextureLoader().load('./textures/greenBoard.png', function(texture){
-		// texture.wrapS = THREE.RepeatWrapping;
-		// texture.wrapT = THREE.RepeatWrapping;
-		// texture.repeat.set(1, 1);
-		// let greenBoardMaterial = new THREE.MeshPhongMaterial({color: 0x0f4718});
 		let greenBoardMaterial = new THREE.MeshLambertMaterial({map: texture});
 		let greenBoard = new THREE.Mesh(greenBoardGeometry, greenBoardMaterial);
 		board.add(greenBoard);
@@ -223,7 +186,6 @@ function runBootStrap(){
 		texture.wrapT = THREE.RepeatWrapping;
 		texture.wrapS = THREE.RepeatWrapping;
 		texture.repeat.set(16, 16);
-		// let brownBoardMaterial = new THREE.MeshLambertMaterial({ color: 0xa5610e});
 		let brownBoardMaterial = new THREE.MeshLambertMaterial({ map: texture});
 		let brownBoard = new THREE.Mesh(brownBoardGeometry, brownBoardMaterial);
 		brownBoard.position.z = -0.201;	
@@ -232,7 +194,6 @@ function runBootStrap(){
 	
 
 	let sideBarGeometry =  new THREE.BoxGeometry(0.1, boardHeight + 0.2, 0.5); 
-	// let sideBarMaterial = new THREE.MeshPhongMaterial({color: 0x4e514b});
 	new THREE.TextureLoader().load('./textures/silverTexture.png', function(texture){
 		texture.repeat.set(8, 8);
 		let sideBarMaterial = new THREE.MeshPhongMaterial({map: texture});
@@ -271,17 +232,14 @@ function runBootStrap(){
 		height: 0.001,
 		curveSegments: 3
 	});
-	// let theMoneyGameText = drawText("The Money Game", 0x8e918b, 0.4, 0.05, fontBootStrap, 0);
 	new THREE.TextureLoader().load('./textures/chalkTexture.png',function(texture){
 		texture.wrapS = THREE.RepeatWrapping;
 		texture.wrapT = THREE.RepeatWrapping;
 		texture.repeat.set(20, 20);
 		let theMoneyGameTextMaterial = new THREE.MeshLambertMaterial({map: texture, transparent: false});
-		// theMoneyGameTextMaterial.opacity = 0.3;
 		theMoneyGameText = new THREE.Mesh(theMoneyGameTextGeometry, theMoneyGameTextMaterial);
 		theMoneyGameText.position.x -= 2.2;
 		theMoneyGameText.position.z = .1;
-		// theMoneyGameText.rotation.y = deg2Rad(-15);
 		board.add(theMoneyGameText);
 		PIErender();
 	});
@@ -327,27 +285,7 @@ function drawTender(texture){
 	let coverGeometry = new THREE.PlaneGeometry(tenderWidth, tenderHeight);
 	coverGeometry.computeBoundingBox();
 	let coverMaterialOuter = new THREE.MeshBasicMaterial({map: texture});
-	// let coverMaterialInner = new THREE.MeshBasicMaterial({color: shades.secondaryLightColor});
 	let coverOuter = new THREE.Mesh(coverGeometry, coverMaterialOuter);
-	// let coverInner = new THREE.Mesh(coverGeometry, coverMaterialInner);
-	// coverInner.scale.x -= scaleDownInnerTender;
-	// coverInner.scale.y -= scaleDownInnerTender + 0.06;
-	// valueDrawen = drawText(value, shades.secondaryDarkColor, tenderTextSize, tenderTextHeight, fontCurrency, 0.0, true);
-	// let bbValue = valueDrawen.geometry.boundingBox.clone();
-	// let bbCover = coverOuter.geometry.boundingBox.clone();
-	// let centerValueX = (bbValue.max.x + bbValue.min.x) / 2;
-	// let centerValueY = (bbValue.max.y + bbValue.min.y) / 2;
-
-	// let centerCoverX = (bbCover.max.x + bbCover.min.x) / 2;  
-	// let centerCoverY = (bbCover.max.y + bbCover.min.y) / 2; 
-
-	// valueDrawen.translateX(centerCoverX - centerValueX);
-	// valueDrawen.translateY(centerCoverY - centerValueY);
-
-	// let noteBox = new THREE.Group();
-	// noteBox.add(coverOuter);
-	// noteBox.add(coverInner);
-	// noteBox.add(valueDrawen);
 	return coverOuter;
 }
 
@@ -464,11 +402,36 @@ var valuesGame1 = {
 	}
 }
 
+function padWithSpace(prefix, value, left){
+	let finalNumber = prefix + "" + value + "";
+	let valueInt = parseInt(value);
+	let valueInt2 = parseInt(value);
+	let count = 0;
+	while(valueInt > 0){
+		count+=1;
+		valueInt= parseInt(valueInt/10);
+	}
+	let toAdd = left - count;
+	if(value - valueInt2 != 0 && valueInt2 == 0){
+		toAdd = 2;
+	}
+	if(toAdd != 0){
+		
+		// console.log("For: " + value + " to Add: {" + toAdd + "}");
+		let stringToAdd = "";
+		for(let i = 0; i < toAdd; ++i){
+			stringToAdd += "  ";
+		}
+		finalNumber = stringToAdd + finalNumber;
+	}
+	return finalNumber;
+}
+
 var boxIndexMap = [106, 110, 73, 59.5, 30, 90];
 function getTextGame1(value){
 	let group = new THREE.Group();
 	group.position.z = 1.1;
-	let eqlSign = drawText("=", 0x010101, 0.25, 0.001, fontGeneral, 0);
+	let eqlSign = drawText("=", 0x121212, 0.25, 0.001, fontGeneral, 0);
 	eqlSign.position.x = -1.3;
 	eqlSign.position.y = 0.8;
 	group.add(eqlSign);
@@ -479,27 +442,28 @@ function getTextGame1(value){
 		if(temp - parseInt(temp) != 0){
 			temp = temp.toFixed(2);
 		}
-		let times = drawText("x"+valuesGame1[value][key] + "=Rs. " + temp, 0x010101, 0.12, 0.001, fontGeneral, 0);
-		tndr.position.set(-0.3, 1.3 - downBy, 0);
-		times.position.set(0.2, 1.3 - downBy - 0.05, 0);
+		let times = drawText("x"+valuesGame1[value][key] + "= " + padWithSpace("Rs. ", temp, 3), 0x121212, 0.16, 0.001, fontGeneral, 0.0, true);
+		tndr.position.set(-0.3, 1.3 - downBy, 1);
+		times.position.set(0.2, 1.3 - downBy - 0.05, 1);
 		tndr.scale.x = 0.4;
 		tndr.scale.y = 0.4;
 		group.add(tndr);
 		group.add(times);
 		downBy += 0.45;
 	}
-	downBy -= 0.15;
+	downBy = downBy - 0.10;
 	let bxGm = new THREE.PlaneGeometry(3, 0.01);
-	let bxMt = new THREE.MeshBasicMaterial({color: 0x010101});
+	let bxMt = new THREE.MeshBasicMaterial({color: 0x121212});
 	let bx = new THREE.Mesh(bxGm, bxMt);
-	bx.position.x = -0;
+	bx.position.x = 0;
 	bx.position.y = 1.3 - downBy;
 	if(value - parseInt(value) != 0){
 		value = value.toFixed(2);
 	}
-	let ttl = drawText("Rs. " + value, 0x010101, 0.15, 0.001, fontGeneral, 0.0);
-	ttl.position.x = 0.2;
-	ttl.position.y = 1.3 - downBy - 0.3;
+	let ttl = drawText(padWithSpace("Rs. ", value, 3), 0x121212, 0.15, 0.001, fontGeneral, 0.0, true);
+	ttl.position.x = 0.6;
+	ttl.position.y = 1.3 - downBy - 0.15;
+	ttl.position.z = 1;
 	group.add(bx);
 	group.add(ttl);
 	return group;
@@ -526,9 +490,6 @@ function drawBoxGame1(value){
 
 	let boxCenterX = (bbBox.max.x + bbBox.min.x) / 2;
 	let boxCenterY = (bbBox.max.y + bbBox.min.y) / 2;
-
-	// console.log(textCenterX + " " + textCenterY);
-	// console.log(boxCenterX + " " + boxCenterY);
 
 	txt.translateX(boxCenterX - textCenterX);
 	txt.translateY(boxCenterY - textCenterY);
@@ -948,8 +909,8 @@ function initControlsGame3(){
 }
 
 function drawItemObject(value, objName, position){
-	let textValue = drawText("x " + value, 0x333333, 0.1, 0.001, fontSpecific, 0.0, true);
-	let textObject = drawText(objName, 0x333333, 0.1, 0.001, fontSpecific, 0.0, true);
+	let textValue = drawText("x " + value, 0x121212, 0.1, 0.001, fontSpecific, 0.0, true);
+	let textObject = drawText(objName, 0x121212, 0.1, 0.001, fontSpecific, 0.0, true);
 	let minButton = buttonStyle("-", true);
 	textObject.position.set(position[0], position[1], position[2]);
 	textValue.position.set(position[0] + 0.6, position[1], position[2]);
@@ -1089,9 +1050,9 @@ function drawShop(){
 		shopItems.push(toffee);
 
 		itembbsGame3 = [];
+		itembbsGame3.push(getRestructuredBoundingBox(ball, 1.8, 1.8));
 		itembbsGame3.push(getRestructuredBoundingBox(top));
 		itembbsGame3.push(getRestructuredBoundingBox(pencil, 1.7, 1.7));
-		itembbsGame3.push(getRestructuredBoundingBox(ball, 1.8, 1.8));
 		itembbsGame3.push(getRestructuredBoundingBox(eraser, 2, 2));
 		itembbsGame3.push(getRestructuredBoundingBox(toffee, 1.8, 2.2));
 
@@ -1138,7 +1099,7 @@ function drawShop(){
 	billplateCover = new THREE.Mesh(billplateGeometry, billMaterial);
 	billplateCover.position.set(-2.7, .1, 2.5);
 
-	billHeadText = drawText("Your Items", 0x333333, 0.1, 0.001, fontSpecific, 0.0, true);
+	billHeadText = drawText("Your Items", 0x121212, 0.1, 0.001, fontSpecific, 0.0, true);
 	billHeadText.position.set(-3.0, 1.3, 2.6);
 
 	billplate = new THREE.Group();
@@ -1149,11 +1110,11 @@ function drawShop(){
 	yourItemsGame3Count = [0, 0, 0, 0, 0];
 	yourItemsGame3Obj = [];
 
-	ballItem = drawItemObject(yourItemsGame3Count[0], "Ball", [-3.32, 1.0, 2.6]);
-	topItem = drawItemObject(yourItemsGame3Count[1], "Top", [-3.32, .6, 2.6]);
-	pencilItem = drawItemObject(yourItemsGame3Count[2], "Pencil", [-3.32, 0.2, 2.6]);
-	eraserItem = drawItemObject(yourItemsGame3Count[3], "Eraser", [-3.32, -0.2, 2.6]);
-	candyItem = drawItemObject(yourItemsGame3Count[4], "Candy", [-3.32, -0.6, 2.6]);
+	ballItem = drawItemObject(yourItemsGame3Count[0], "Ball", [-3.32, 1.0, 2.9]);
+	topItem = drawItemObject(yourItemsGame3Count[1], "Top", [-3.32, .6, 2.9]);
+	pencilItem = drawItemObject(yourItemsGame3Count[2], "Pencil", [-3.32, 0.2, 2.9]);
+	eraserItem = drawItemObject(yourItemsGame3Count[3], "Eraser", [-3.32, -0.2, 2.9]);
+	candyItem = drawItemObject(yourItemsGame3Count[4], "Candy", [-3.32, -0.6, 2.9]);
 
 	yourItemsGame3Obj.push(ballItem);
 	yourItemsGame3Obj.push(topItem);
@@ -1229,7 +1190,7 @@ function handleAddItemGame3(index){
 		return;
 	}
 	yourItemsGame3Count[index] += 1;
-	let textValue = drawText("x " + yourItemsGame3Count[index], 0x333333, 0.1, 0.001, fontSpecific, 0.0, true);
+	let textValue = drawText("x " + yourItemsGame3Count[index], 0x121212, 0.1, 0.001, fontSpecific, 0.0, true);
 	PIEremoveElement(yourItemsGame3Obj[index][1]);
 	textValue.position.set(yourItemsGame3Obj[index][3][0] + 0.6, yourItemsGame3Obj[index][3][1], yourItemsGame3Obj[index][3][2]);
 	yourItemsGame3Obj[index][1] = textValue;
@@ -1241,7 +1202,7 @@ function handleRemoveItemGame3(index){
 		return;
 	}
 	yourItemsGame3Count[index] -= 1;
-	let textValue = drawText("x " + yourItemsGame3Count[index], 0x333333, 0.1, 0.001, fontSpecific, 0.0, true);
+	let textValue = drawText("x " + yourItemsGame3Count[index], 0x121212, 0.1, 0.001, fontSpecific, 0.0, true);
 	PIEremoveElement(yourItemsGame3Obj[index][1]);
 	textValue.position.set(yourItemsGame3Obj[index][3][0] + 0.6, yourItemsGame3Obj[index][3][1], yourItemsGame3Obj[index][3][2]);
 	yourItemsGame3Obj[index][1] = textValue;
@@ -1460,12 +1421,14 @@ function onDocumentMouseDown( event ) {
 			return;
 		} 
 
-		for(let i = 0; i < yourItemsGame3Obj.length; ++i){
-			let objects = yourItemsGame3Obj[i][2];
-			intersects = raycaster.intersectObjects(objects.children);
-			if(intersects.length > 0){
-				handleRemoveItemGame3(i);
-				return;
+		if(showingInvoice == false){
+			for(let i = 0; i < yourItemsGame3Obj.length; ++i){
+				let objects = yourItemsGame3Obj[i][2];
+				intersects = raycaster.intersectObjects(objects.children);
+				if(intersects.length > 0){
+					handleRemoveItemGame3(i);
+					return;
+				}
 			}
 		}
 		
