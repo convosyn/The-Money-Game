@@ -464,8 +464,13 @@ function getTextGame1(value){
 	ttl.position.x = 0.56;
 	ttl.position.y = 1.3 - downBy - 0.15;
 	ttl.position.z = 1;
+	let ttlString = drawText("total  = ", 0x121212, 0.15, 0.001, fontGeneral, 0.0, true);
+	ttlString.position.x = -0.16;
+	ttlString.position.y = 1.3 - downBy - 0.15;
+	ttlString.position.z = 1;
 	group.add(bx);
 	group.add(ttl);
+	group.add(ttlString);
 	return group;
 }
 
@@ -859,7 +864,7 @@ function addGame2(){
 	let headTextGame2_1 = drawText("See how the notes and coins add up to make amount!", 0xedb84e, 0.15, 0.001, fontSpecific, 0.0, true);
 	headTextGame2_1.position.set(-2.2, 2.1, 0.15);
 
-	let headTextGame2_2 = drawText("(Click +/- to add/remove)", 0xedb84e, 0.11, 0.001, fontSpecific, 0.0, true);
+	let headTextGame2_2 = drawText("(Click + to add OR - to remove)", 0xedb84e, 0.11, 0.001, fontSpecific, 0.0, true);
 	headTextGame2_2.position.set(-1.0, 1.93, 0.15);
 
 	headTextGame2  = new THREE.Group();
@@ -895,6 +900,7 @@ var priceMap = {
 var yourItemsGame3Obj;
 var yourItemsGame3Count;
 var itembbsGame3;
+var disableInvoice;
 
 function initControlsGame3(){
 	bendBoardBool = true;
@@ -906,6 +912,10 @@ function initControlsGame3(){
 	currentRotationBoard = board.rotation.x;
 	yourItemsGame3Obj = undefined;
 	yourItemsGame3Count = [0, 0, 0, 0, 0];
+}
+
+function isGenerateInvoice(){
+	return (yourItemsGame3Count[0] + yourItemsGame3Count[1] + yourItemsGame3Count[2] + yourItemsGame3Count[3] + yourItemsGame3Count[4]) > 0;
 }
 
 function drawItemObject(value, objName, position){
@@ -928,7 +938,7 @@ function getRestructuredBoundingBox(obj, scalex = 1.8, scaley = 1.5){
 
 	let boxFromGm = new THREE.BoxGeometry(incXWidth, incYWidth, Zwidth);
 	let boxMaterial = new THREE.MeshPhongMaterial({color: 0xffffff, transparent: true});
-	boxMaterial.opacity = 0.01;
+	boxMaterial.opacity = 0.1;
 	let bx = new THREE.Mesh(boxFromGm, boxMaterial);
 	let  bbNew = new THREE.Box3().setFromObject(bx);
 
@@ -945,6 +955,67 @@ function getRestructuredBoundingBox(obj, scalex = 1.8, scaley = 1.5){
 	bx.translateZ(centerZPrev - centerZNew);
 
 	return bx;
+}
+
+function game3TextBox(string, fontSize, scaled = [1.2, 1.7]){
+	var text = drawText(string, 0xdddddd, fontSize, 0.001, fontGeneral, 0.0, true);
+	var box = getRestructuredBoundingBox(text, scaled[0], scaled[1]);
+	var group = new THREE.Group();
+	group.add(text);
+	group.add(box);
+	return group;
+}
+
+function doneButtonType(){
+	let button = undefined;
+	if(!isGenerateInvoice()){
+		let doneButtonGeometry = new THREE.PlaneGeometry(1.4, 0.25, 2, 2);
+		doneButtonGeometry.computeBoundingBox();
+		let doneButtonMaterial = new THREE.MeshLambertMaterial({color: 0x333333});
+		let doneButtonCover = new THREE.Mesh(doneButtonGeometry, doneButtonMaterial);
+		let doneButtonText = drawText("Generate Invoice", 0xdddddd, 0.1, 0.001, fontSpecific, 0.0, true);
+
+		let bbText = doneButtonText.geometry.boundingBox.clone();
+		let bbBox = doneButtonCover.geometry.boundingBox.clone();
+
+		let textCenterX = (bbText.max.x + bbText.min.x) / 2;
+		let textCenterY = (bbText.max.y + bbText.min.y) / 2;
+
+		let boxCenterX = (bbBox.max.x + bbBox.min.x) / 2;
+		let boxCenterY = (bbBox.max.y + bbBox.min.y) / 2;
+
+		doneButtonText.translateX(boxCenterX - textCenterX);
+		doneButtonText.translateY(boxCenterY - textCenterY);
+		
+		button = new THREE.Group();
+		button.add(doneButtonCover);
+		button.add(doneButtonText);
+
+	} else {
+		let doneButtonGeometry = new THREE.PlaneGeometry(1.4, 0.25, 2, 2);
+		doneButtonGeometry.computeBoundingBox();
+		let doneButtonMaterial = new THREE.MeshLambertMaterial({color: 0x1f63d1});
+		let doneButtonCover = new THREE.Mesh(doneButtonGeometry, doneButtonMaterial);
+		let doneButtonText = drawText("Generate Invoice", 0xffffff, 0.1, 0.001, fontSpecific, 0.0, true);
+
+		let bbText = doneButtonText.geometry.boundingBox.clone();
+		let bbBox = doneButtonCover.geometry.boundingBox.clone();
+
+		let textCenterX = (bbText.max.x + bbText.min.x) / 2;
+		let textCenterY = (bbText.max.y + bbText.min.y) / 2;
+
+		let boxCenterX = (bbBox.max.x + bbBox.min.x) / 2;
+		let boxCenterY = (bbBox.max.y + bbBox.min.y) / 2;
+
+		doneButtonText.translateX(boxCenterX - textCenterX);
+		doneButtonText.translateY(boxCenterY - textCenterY);
+
+		button = new THREE.Group();
+		button.add(doneButtonCover);
+		button.add(doneButtonText);
+	}
+	button.position.set(-2.7, -1.0, 2.6);
+	return button;
 }
 
 var pointLight;
@@ -975,7 +1046,7 @@ function drawShop(){
 		top.add(topUp);
 		top.add(topPin);
 		top.add(topTop);
-		top.position.set(.0, 1.0, -0.2);
+		top.position.set(.0, 0.85, 0.0);
 		top.rotation.z = deg2Rad(200);
 		top.rotation.x = deg2Rad(-40);
 
@@ -1003,7 +1074,7 @@ function drawShop(){
 		pencilPin.rotation.z = deg2Rad(180);
 		pencilTip.position.y = -0.45;
 		pencilPin.position.y = -0.55;
-		pencil.position.set(1.5, 1.0, -0.2);
+		pencil.position.set(1.5, 0.9, 0.0);
 
 		pencil.rotation.x = deg2Rad(-50);
 		pencil.rotation.z = deg2Rad(-30);
@@ -1019,7 +1090,7 @@ function drawShop(){
 
 		eraser.rotation.y = deg2Rad(20);
 		eraser.rotation.x = deg2Rad(50);
-		eraser.position.set(-0.5, 0.0, 1.0);
+		eraser.position.set(-0.7, -0.5, 2.0);
 
 		let toffeeGeometry = new THREE.CylinderGeometry(0.1, 0.1, 0.4, 4, 1, false);
 		let toffeeMaterial = new THREE.MeshPhongMaterial({color: 0x3e2fa3});
@@ -1040,7 +1111,7 @@ function drawShop(){
 		toffee.add(toffeeOpen1);
 		toffee.add(toffeeOpen2);
 
-		toffee.position.set(1.0, 0.0, 1.0);
+		toffee.position.set(0.6, -0.5, 2.0);
 
 		shopItems = [];
 		shopItems.push(ball);
@@ -1050,12 +1121,11 @@ function drawShop(){
 		shopItems.push(toffee);
 
 		itembbsGame3 = [];
-		itembbsGame3.push(getRestructuredBoundingBox(ball, 1.8, 1.8));
-		itembbsGame3.push(getRestructuredBoundingBox(top));
-		itembbsGame3.push(getRestructuredBoundingBox(pencil, 1.7, 1.7));
-		itembbsGame3.push(getRestructuredBoundingBox(eraser, 2, 2));
-		itembbsGame3.push(getRestructuredBoundingBox(toffee, 1.8, 2.2));
-
+		itembbsGame3.push(getRestructuredBoundingBox(ball, 1.7, 1.7));
+		itembbsGame3.push(getRestructuredBoundingBox(top, 2.0, 1.25));
+		itembbsGame3.push(getRestructuredBoundingBox(pencil, 1.4, 1.4));
+		itembbsGame3.push(getRestructuredBoundingBox(eraser, 1.8, 1.4));
+		itembbsGame3.push(getRestructuredBoundingBox(toffee, 1.3, 3.5));
 		
 	}
 
@@ -1068,20 +1138,25 @@ function drawShop(){
 	}
 
 	priceVars = [];
-	priceBall = drawText("Ball-Rs." + priceMap[0], 0xdddddd, 0.13, 0.001, fontGeneral, 0.0, true);
-	priceBall.position.set(-1.7, 0.5, 0.5);
+	// priceBall = drawText("Ball-Rs." + priceMap[0], 0xdddddd, 0.13, 0.001, fontGeneral, 0.0, true);
+	priceBall = game3TextBox("Ball-Rs." + priceMap[0], 0.13);
+	priceBall.position.set(-1.76, 0.4, 0.6);
 
-	priceTop = drawText("Top-Rs." + priceMap[1], 0xdddddd, 0.13, 0.001, fontGeneral, 0.0, true);
-	priceTop.position.set(-0.2, 0.5, 0.5);
+	// priceTop = drawText("Top-Rs." + priceMap[1], 0xdddddd, 0.13, 0.001, fontGeneral, 0.0, true);
+	priceTop = game3TextBox("Top-Rs." + priceMap[1], 0.13);
+	priceTop.position.set(-0.43, 0.3, 0.6);
 
-	pricePencil = drawText("Pencil-Rs." + priceMap[2], 0xdddddd, 0.13, 0.001, fontGeneral, 0.0, true);
-	pricePencil.position.set(1.1, 0.5, 0.5);
+	// pricePencil = drawText("Pencil-Rs." + priceMap[2], 0xdddddd, 0.13, 0.001, fontGeneral, 0.0, true);
+	pricePencil = game3TextBox("Pencil-Rs." + priceMap[2], 0.13);
+	pricePencil.position.set(1.05, 0.2, 0.5);
 
-	priceEraser = drawText("Eraser-Rs." + (priceMap[3]).toFixed(2), 0xdddddd, 0.13, 0.001, fontGeneral, 0.0, true);
-	priceEraser.position.set(-1.0, -0.4, 1.2);
+	// priceEraser = drawText("Eraser-Rs." + (priceMap[3]).toFixed(2), 0xdddddd, 0.115, 0.001, fontGeneral, 0.0, true);
+	priceEraser = game3TextBox("Eraser-Rs." + (priceMap[3]).toFixed(2), 0.11, [1.1, 2]);
+	priceEraser.position.set(-1.15, -0.97, 2.0);
 
-	priceCandy = drawText("Candy-Rs." + (priceMap[4]).toFixed(2), 0xdddddd, 0.13, 0.001, fontGeneral, 0.0, true);
-	priceCandy.position.set(0.6, -0.4, 1.2);
+	// priceCandy = drawText("Candy-Rs." + (priceMap[4]).toFixed(2), 0xdddddd, 0.115, 0.001, fontGeneral, 0.0, true);
+	priceCandy = game3TextBox("Candy-Rs." + (priceMap[4]).toFixed(2), 0.10, [1.1, 1.5]);
+	priceCandy.position.set(0.21, -1.02, 2.0);
 
 	priceVars.push(priceBall);
 	priceVars.push(priceTop);
@@ -1099,8 +1174,8 @@ function drawShop(){
 	billplateCover = new THREE.Mesh(billplateGeometry, billMaterial);
 	billplateCover.position.set(-2.7, .1, 2.5);
 
-	billHeadText = drawText("Your Items", 0x121212, 0.1, 0.001, fontSpecific, 0.0, true);
-	billHeadText.position.set(-3.0, 1.3, 2.6);
+	billHeadText = drawText("YOUR  ITEMS", 0x121212, 0.1, 0.001, fontSpecific, 0.0, true);
+	billHeadText.position.set(-3.1, 1.35, 2.6);
 
 	billplate = new THREE.Group();
 	billplate.add(billplateCover);
@@ -1110,11 +1185,11 @@ function drawShop(){
 	yourItemsGame3Count = [0, 0, 0, 0, 0];
 	yourItemsGame3Obj = [];
 
-	ballItem = drawItemObject(yourItemsGame3Count[0], "Ball", [-3.32, 1.0, 2.9]);
-	topItem = drawItemObject(yourItemsGame3Count[1], "Top", [-3.32, .6, 2.9]);
-	pencilItem = drawItemObject(yourItemsGame3Count[2], "Pencil", [-3.32, 0.2, 2.9]);
-	eraserItem = drawItemObject(yourItemsGame3Count[3], "Eraser", [-3.32, -0.2, 2.9]);
-	candyItem = drawItemObject(yourItemsGame3Count[4], "Candy", [-3.32, -0.6, 2.9]);
+	ballItem = drawItemObject(yourItemsGame3Count[0], "Ball", [-3.22, 1.0, 2.9]);
+	topItem = drawItemObject(yourItemsGame3Count[1], "Top", [-3.22, .6, 2.9]);
+	pencilItem = drawItemObject(yourItemsGame3Count[2], "Pencil", [-3.22, 0.2, 2.9]);
+	eraserItem = drawItemObject(yourItemsGame3Count[3], "Eraser", [-3.22, -0.2, 2.9]);
+	candyItem = drawItemObject(yourItemsGame3Count[4], "Candy", [-3.22, -0.6, 2.9]);
 
 	yourItemsGame3Obj.push(ballItem);
 	yourItemsGame3Obj.push(topItem);
@@ -1128,28 +1203,9 @@ function drawShop(){
 		PIEaddElement(yourItemsGame3Obj[i][2]);
 	}
 
-	let doneButtonGeometry = new THREE.PlaneGeometry(1.4, 0.25, 2, 2);
-	doneButtonGeometry.computeBoundingBox();
-	let doneButtonMaterial = new THREE.MeshLambertMaterial({color: 0x333333});
-	let doneButtonCover = new THREE.Mesh(doneButtonGeometry, doneButtonMaterial);
-	doneButtonText = drawText("Done", 0xdddddd, 0.1, 0.001, fontSpecific, 0.0, true);
+	
 
-	let bbText = doneButtonText.geometry.boundingBox.clone();
-	let bbBox = doneButtonCover.geometry.boundingBox.clone();
-
-	let textCenterX = (bbText.max.x + bbText.min.x) / 2;
-	let textCenterY = (bbText.max.y + bbText.min.y) / 2;
-
-	let boxCenterX = (bbBox.max.x + bbBox.min.x) / 2;
-	let boxCenterY = (bbBox.max.y + bbBox.min.y) / 2;
-
-	doneButtonText.translateX(boxCenterX - textCenterX);
-	doneButtonText.translateY(boxCenterY - textCenterY);
-
-	doneButton = new THREE.Group();
-	doneButton.add(doneButtonCover);
-	doneButton.add(doneButtonText);
-	doneButton.position.set(-2.7, -1.0, 2.6);
+	doneButton = doneButtonType();
 
 	PIEaddElement(doneButton);
 	hasBoxesGame3 = true;
@@ -1186,7 +1242,7 @@ function bendBoard(inverse = false){
 }
 
 function handleAddItemGame3(index){
-	if(yourItemsGame3Count[index] >= 10){
+	if(yourItemsGame3Count[index] >= 20){
 		return;
 	}
 	yourItemsGame3Count[index] += 1;
@@ -1195,6 +1251,9 @@ function handleAddItemGame3(index){
 	textValue.position.set(yourItemsGame3Obj[index][3][0] + 0.6, yourItemsGame3Obj[index][3][1], yourItemsGame3Obj[index][3][2]);
 	yourItemsGame3Obj[index][1] = textValue;
 	PIEaddElement(yourItemsGame3Obj[index][1]);
+	PIEremoveElement(doneButton);
+	doneButton = doneButtonType();
+	PIEaddElement(doneButton);
 }
 
 function handleRemoveItemGame3(index){
@@ -1207,6 +1266,9 @@ function handleRemoveItemGame3(index){
 	textValue.position.set(yourItemsGame3Obj[index][3][0] + 0.6, yourItemsGame3Obj[index][3][1], yourItemsGame3Obj[index][3][2]);
 	yourItemsGame3Obj[index][1] = textValue;
 	PIEaddElement(yourItemsGame3Obj[index][1]);
+	PIEremoveElement(doneButton);
+	doneButton = doneButtonType();
+	PIEaddElement(doneButton);
 }
 
 function removeInvoice(){
@@ -1245,7 +1307,7 @@ var invoice;
 var showingInvoice;
 var invoiceCross;
 function handleShowInvoice(){
-	if(showingInvoice == true){
+	if(showingInvoice == true || !isGenerateInvoice()){
 		return;
 	}
 	showingInvoice = true;
@@ -1299,8 +1361,13 @@ function handleShowInvoice(){
 	if(totalAmountNumeric - parseInt(totalAmountNumeric) != 0){
 		totalAmountNumeric = totalAmountNumeric.toFixed(2);
 	}
-	totalAmountText = drawText("Rs " + totalAmountNumeric, 0x333333, 0.15, 0.001, fontSpecific, 0.0, true);
+	let totalAmountText = drawText("Rs " + totalAmountNumeric, 0x333333, 0.15, 0.001, fontSpecific, 0.0, true);
 	totalAmountText.position.set(1.2, -1.8, 3.01);
+
+	let dated = drawText("Dated: " + new Date().toLocaleString(), 0x333333, 0.09, 0.001, fontSpecific, 0.0, true);
+	dated.position.set(0.65, 1.6, 3.01);
+
+
 
 	let headersForItems = itemForInvoice("SNo", "Item Name", "Quantity", "Price", [-2.45, 1.3, 3.01]); 
 	let itemNames = ['Ball', 'Top', 'Pencil', 'Eraser', 'Candy'];
@@ -1314,7 +1381,7 @@ function handleShowInvoice(){
 			if(ttl - parseInt(ttl) != 0){
 				ttl = ttl.toFixed(2);
 			}
-			let textItem = itemForInvoice(currentIndex, itemNames[i], yourItemsGame3Count[i], ttl, [-2.2, 1. - downBy, 3.01], 0.1);
+			let textItem = itemForInvoice(currentIndex, itemNames[i], yourItemsGame3Count[i], ttl, [-2.2, 1. - downBy, 3.01], 0.13);
 			currentIndex += 1;
 			invoice.add(textItem);
 			downBy += 0.4;
@@ -1334,6 +1401,7 @@ function handleShowInvoice(){
 	invoice.add(totalDisplay);
 	invoice.add(totalAmountText);
 	invoice.add(headersForItems);
+	invoice.add(dated);
 	invoice.scale.x = 0.8;
 	invoice.scale.y = 0.8;
 
@@ -1434,6 +1502,19 @@ function onDocumentMouseDown( event ) {
 		
 		for(let i=0;i<itembbsGame3.length;i++){
 			let objects = itembbsGame3[i];
+			if(objects.children.length == 0){
+				intersects = raycaster.intersectObjects([objects]);
+			} else {
+				intersects = raycaster.intersectObjects(objects.children);
+			}
+			if ( intersects.length > 0 ) {
+				console.log("This intersects: " + i);
+				handleAddItemGame3(i);
+				return;
+			}
+		}
+		for(let i=0;i<priceVars.length;i++){
+			let objects = priceVars[i];
 			if(objects.children.length == 0){
 				intersects = raycaster.intersectObjects([objects]);
 			} else {
