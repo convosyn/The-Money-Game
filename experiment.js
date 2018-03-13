@@ -442,7 +442,7 @@ function getTextGame1(value){
 		if(temp - parseInt(temp) != 0){
 			temp = temp.toFixed(2);
 		}
-		let times = drawText("x"+valuesGame1[value][key] + "= " + padWithSpace("Rs. ", temp, 3), 0x121212, 0.16, 0.001, fontGeneral, 0.0, true);
+		let times = drawText("x"+valuesGame1[value][key] + "= Rs." + padWithSpace(" ", temp, 3), 0x121212, 0.16, 0.001, fontGeneral, 0.0, true);
 		tndr.position.set(-0.3, 1.3 - downBy, 1);
 		times.position.set(0.2, 1.3 - downBy - 0.05, 1);
 		tndr.scale.x = 0.4;
@@ -460,8 +460,8 @@ function getTextGame1(value){
 	if(value - parseInt(value) != 0){
 		value = value.toFixed(2);
 	}
-	let ttl = drawText(padWithSpace("Rs. ", value, 3), 0x121212, 0.15, 0.001, fontGeneral, 0.0, true);
-	ttl.position.x = 0.6;
+	let ttl = drawText("Rs. " + padWithSpace(" ", value, 3), 0x121212, 0.15, 0.001, fontGeneral, 0.0, true);
+	ttl.position.x = 0.56;
 	ttl.position.y = 1.3 - downBy - 0.15;
 	ttl.position.z = 1;
 	group.add(bx);
@@ -546,7 +546,7 @@ function addBoxesGame1(){
 								  new THREE.Vector3(0, 1, 0));
 		triGeometry.faces.push(new THREE.Face3(0, 1, 2));
 		triGeometry.computeBoundingBox();
-		boxMaterial.opacity = 0.95;
+		boxMaterial.opacity = 0.989;
 		boxGame1 = new THREE.Mesh(boxGeometry, boxMaterial);
 		boxTriGame1 = new THREE.Mesh(triGeometry, boxMaterial);
 		boxTriGame1.scale.x = 0.2;
