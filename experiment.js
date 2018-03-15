@@ -337,7 +337,7 @@ function handleShowClickCustomGame(){
 			imagePart.position.set(0.0, downBy, 0.6);
 			let temp = countForThis * tndr['val'];
 			let times = drawText("x"+countForThis + "= Rs." + padWithSpace(" ", temp, 3), 0xcdcdcd, 0.14, 0.001, fontGeneral, 0.0, true);
-			times.position.set(1.0, downBy - 0.1, 0.6);
+			times.position.set(0.7, downBy - 0.05, 0.6);
 			let grp = new THREE.Group();
 			grp.add(imagePart);
 			grp.add(times);
@@ -352,7 +352,7 @@ function handleShowClickCustomGame(){
 			imagePart.scale.y = 0.47;
 			imagePart.position.set(0.0, downBy, 0.6);
 			let times = drawText("x"+1 + "= Rs." + padWithSpace(" ", "0.50", 3), 0xcdcdcd, 0.14, 0.001, fontGeneral, 0.0, true);
-			times.position.set(1.0, downBy - 0.1, 0.6);
+			times.position.set(0.7, downBy - 0.05, 0.6);
 			let grp = new THREE.Group();
 			grp.add(imagePart);
 			grp.add(times);
@@ -372,7 +372,7 @@ function handleShowClickCustomGame(){
 		value = value.toFixed(2);
 	} 
 	var txtTotal = drawText("Total = Rs." + padWithSpace(" ", value, 3), 0xcdcdcd, 0.14, 0.001, fontGeneral, 0.0, true);
-	txtTotal.position.set(0.73, downBy, 0.6);
+	txtTotal.position.set(0.43, downBy, 0.6);
 	noteConfCustomGame.add(txtTotal);
 
 	noteConfCustomGame.position.set(0.5, 1.8, 0.6);
@@ -454,9 +454,9 @@ function customNoteScene(){
 	let seperatorMaterial = new THREE.MeshBasicMaterial({color: 0xffffff, transparent: true});
 	seperatorMaterial.opacity = 0.8;
 	seperatorCustomGame = new THREE.Mesh(seperatorGeometry, seperatorMaterial);
-	seperatorCustomGame.position.set(-0.9, 0, 0.6);
+	seperatorCustomGame.position.set(-0.7, 0, 0.6);
 
-	let infoBoxCustomGame1 = drawText("Write any value less than 1000", 0x19e4e8, 0.12, 0.001, fontGeneral, 0.0, true);
+	let infoBoxCustomGame1 = drawText("*Write any amount less than 1000", 0x19e4e8, 0.12, 0.001, fontGeneral, 0.0, true);
 	let infoBoxCustomGame2 = drawText("Click on the SHOW button", 0x19e4e8, 0.12, 0.001, fontGeneral, 0.0, true);
 	let infoBoxCustomGame3 = drawText("to see a possible composition", 0x19e4e8, 0.12, 0.001, fontGeneral, 0.0, true);
 	let infoBoxCustomGame4 = drawText("NOTE: For values after", 0x19e4e8, 0.12, 0.001, fontGeneral, 0.0, true);
@@ -480,7 +480,7 @@ function customNoteScene(){
 
 	infoBoxCustomGame.position.set(-3.1, -0.5, 0.6);
 
-	writeHereDisplayCustomGame = drawText("WRITE VALUE HERE", 0xbbbbbb, 0.10, 0.001, fontCurrency, 0.0, true);
+	writeHereDisplayCustomGame = drawText("*WRITE AMOUNT HERE", 0xbbbbbb, 0.10, 0.001, fontCurrency, 0.0, true);
 	writeHereDisplayCustomGame.position.set(-3.07, 1.3, 0.6);
 
 	PIEaddElement(textDisplayCustomGame);
@@ -507,10 +507,10 @@ function drawText(text, color, size, height, font, rotation = 0.2, basic = false
 	geometry.computeBoundingBox();
 	let textDrawen = undefined;
 	if(basic == false){
-		textDrawen =new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({color:color}));
+		textDrawen =new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({color:color, transparent: true}));
 		textDrawen.rotation.y += rotation;
 	} else if(basic == true){
-		textDrawen =new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({color:color}));
+		textDrawen =new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({color:color, transparent: true}));
 		textDrawen.rotation.y += rotation;
 	}
 	return textDrawen;
@@ -807,7 +807,7 @@ function addBoxesGame1(){
 	let addCustomNoteMaterial = new THREE.MeshBasicMaterial({color: 0x1f63d1});
 	let addCustomNoteCover = new THREE.Mesh(addCustomNoteGeometry, addCustomNoteMaterial);
 
-	let addCustomNoteText = drawText("ADD CUSTOM VALUE", 0xffffff, 0.12, 0.001, fontCurrency, 0.0, true);
+	let addCustomNoteText = drawText("ADD CUSTOM AMOUNT", 0xffffff, 0.12, 0.001, fontCurrency, 0.0, true);
 
 	let alignedNotes = alignCenter(addCustomNoteText, addCustomNoteCover);
 	addCustomNote = new THREE.Group();
@@ -977,9 +977,11 @@ function updateTotal(addOrSub, index){
 	indiCountGame2[index] = amountIndi;
 
 	if(eachValueGame2[index] > 0){
+		indiCountGame2[index].material.opacity = 1.0;
 		tenders[textIndexMapGame2[index]]['img'].material.opacity = 1.0;
 	} else {
 		tenders[textIndexMapGame2[index]]['img'].material.opacity = 0.3;
+		indiCountGame2[index].material.opacity = 0.5;
 	}
 
 	PIEaddElement(indiCountGame2[index]);
@@ -1113,6 +1115,7 @@ function addGame2(){
 			let amount = drawText(eachValueGame2[counter], 0xffffff, 0.2, 0.001, fontGeneral, 0.0, true);
 			let ps = new THREE.Vector3(2.2, 1.7 - downBy - 0.4, 1);
 			positionsGame2.push(ps);
+			amount.material.opacity = 0.5;
 			amount.position.set(2.2, 1.7 - downBy - 0.40, 1);
 			PIEaddElement(amount);
 			indiCountGame2.push(amount);
@@ -1124,6 +1127,7 @@ function addGame2(){
 			buttonsGame2[counter].position.set(-1.0, 1.7 - downBy - 0.3, 1);
 			buttonsGame2[8 + counter].position.set(-0.5, 1.7 - downBy - 0.3, 1);
 			let amount = drawText(eachValueGame2[counter], 0xffffff, 0.2, 0.001, fontGeneral, 0.0, true);
+			amount.material.opacity = 0.5;
 			let ps = new THREE.Vector3(-.82, 1.7 - downBy - 0.4, 1);
 			positionsGame2.push(ps);			
 			amount.position.set(-.82, 1.7 - downBy - 0.40, 1);
@@ -1651,7 +1655,7 @@ function handleShowInvoice(){
 	let genDate = new Date();
 
 	let dated = drawText("Dated: " + genDate.getDate() + "/" + genDate.getMonth() + "/" + genDate.getFullYear() , 0x333333, 0.09, 0.001, fontSpecific, 0.0, true);
-	dated.position.set(0.65, 1.6, 3.01);
+	dated.position.set(1.5, 1.6, 3.01);
 
 
 
