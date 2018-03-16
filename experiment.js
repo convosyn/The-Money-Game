@@ -501,14 +501,14 @@ var boxTriGame1;
 function getTextGame1(value){
 	let group = new THREE.Group();
 	group.position.z = 1.1;
-	let eqlSign = drawText("=", 0x121212, 0.25, 0.001, fontGeneral, 0);
-	eqlSign.position.x = -1.3;
-	eqlSign.position.y = 0.8;
-	group.add(eqlSign);
+	// let eqlSign = drawText("=", 0x121212, 0.25, 0.001, fontGeneral, 0);
+	// eqlSign.position.x = -1.3;
+	// eqlSign.position.y = 0.8;
+	// group.add(eqlSign);
 	downBy = 0.0;
 	for(key in valuesGame1[value]){
 		// let tndr = tenders[key]["img"].clone();
-		let tndr = showMultiple(tenders[key]["img"], valuesGame1[value][key], 1.0, 0.1, [0.2, -0.15, 0.01]);
+		let tndr = showMultiple(tenders[key]["img"], valuesGame1[value][key], 1.0, 0.05, [0.25, -0.2, 0.01]);
 		let temp = tenders[key]['val'] * valuesGame1[value][key];
 		if(temp - parseInt(temp) != 0){
 			temp = temp.toFixed(2);
@@ -516,8 +516,8 @@ function getTextGame1(value){
 		let times = drawText("= Rs." + padWithSpace(" ", temp, 3), 0x121212, 0.16, 0.001, fontGeneral, 0.0, true);
 		tndr.position.set(-0.3, 1.3 - downBy, 1);
 		times.position.set(0.3, 1.3 - downBy - 0.05, 1);
-		tndr.scale.x = 0.4;
-		tndr.scale.y = 0.4;
+		tndr.scale.x = 0.45;
+		tndr.scale.y = 0.45;
 		group.add(tndr);
 		group.add(times);
 		downBy += 0.45;
@@ -535,7 +535,7 @@ function getTextGame1(value){
 	ttl.position.x = 0.56;
 	ttl.position.y = 1.3 - downBy - 0.15;
 	ttl.position.z = 1;
-	let ttlString = drawText("total  = ", 0x121212, 0.15, 0.001, fontGeneral, 0.0, true);
+	let ttlString = drawText("Total  = ", 0x121212, 0.15, 0.001, fontGeneral, 0.0, true);
 	ttlString.position.x = -0.06;
 	ttlString.position.y = 1.3 - downBy - 0.15;
 	ttlString.position.z = 1;
@@ -807,18 +807,18 @@ function handleShowClickCustomGame(){
 	var intPart = parseInt(value);
 	var leftOver = value;
 	var downBy = 0;
-	for(let i = 0; i < toCheckInOrder.length; ++i){
+	for(let i = 0; i < toCheckInOrder.length - 2; ++i){
 		let tndr = tenders[toCheckInOrder[i]];
 		let countForThis = parseInt(leftOver / tndr['val']);
 		leftOver = leftOver % tndr['val'];
 		if(countForThis > 0){
-			let imagePart = showMultiple(tndr['img'].clone(), countForThis, 1.0, 0.01, [0.22, -0.015, 0.01]); //, 1.0, 0.05, [0.1, -0.01, 0.1]);
+			let imagePart = showMultiple(tndr['img'].clone(), countForThis, 1.0, 0.01, [0.35, -0.016, 0.01]); //, 1.0, 0.05, [0.1, -0.01, 0.1]);
 			imagePart.scale.x = 0.47;
 			imagePart.scale.y = 0.47;
 			imagePart.position.set(0.0, downBy, 0.6);
 			let temp = countForThis * tndr['val'];
 			let times = drawText("= Rs." + padWithSpace(" ", temp, 3), 0xcdcdcd, 0.14, 0.001, fontGeneral, 0.0, true);
-			times.position.set(1.3, downBy - 0.05, 0.6);
+			times.position.set(1.8, downBy - 0.05, 0.6);
 			let grp = new THREE.Group();
 			grp.add(imagePart);
 			grp.add(times);
@@ -826,26 +826,47 @@ function handleShowClickCustomGame(){
 			downBy -= 0.51;
 		}
 	}
+	
+	for(let i = toCheckInOrder.length - 2; i < toCheckInOrder.length ; ++i){
+		let tndr = tenders[toCheckInOrder[i]];
+		let countForThis = parseInt(leftOver / tndr['val']);
+		leftOver = leftOver % tndr['val'];
+		if(countForThis > 0){
+			let imagePart = showMultiple(tndr['img'].clone(), countForThis, 1.0, 0.01, [0.35, -0.015, 0.01]); //, 1.0, 0.05, [0.1, -0.01, 0.1]);
+			imagePart.scale.x = 0.47;
+			imagePart.scale.y = 0.47;
+			imagePart.position.set(0.0, downBy, 0.6);
+			let temp = countForThis * tndr['val'];
+			let times = drawText("= Rs." + padWithSpace(" ", temp, 3), 0xcdcdcd, 0.14, 0.001, fontGeneral, 0.0, true);
+			times.position.set(1.8, downBy - 0.05, 0.6);
+			let grp = new THREE.Group();
+			grp.add(imagePart);
+			grp.add(times);
+			noteConfCustomGame.add(grp);
+			downBy -= 0.45;
+		}
+	}
+
 	if(value - intPart != 0){
 		let tndr = tenders['coin50p'];
 		let imagePart = tndr['img'].clone();
 			imagePart.scale.x = 0.47;
 			imagePart.scale.y = 0.47;
 			imagePart.position.set(0.0, downBy, 0.6);
-			let times = drawText("x"+1 + "= Rs." + padWithSpace(" ", "0.50", 3), 0xcdcdcd, 0.14, 0.001, fontGeneral, 0.0, true);
-			times.position.set(0.9, downBy - 0.05, 0.6);
+			let times = drawText("= Rs." + padWithSpace(" ", "0.50", 3), 0xcdcdcd, 0.14, 0.001, fontGeneral, 0.0, true);
+			times.position.set(1.8, downBy - 0.05, 0.6);
 			let grp = new THREE.Group();
 			grp.add(imagePart);
 			grp.add(times);
 			noteConfCustomGame.add(grp);
-			downBy -= 0.51;
+			downBy -= 0.45;
 	}
-	downBy += 0.24;
+	downBy += 0.14;
 	var seperatorGeometry = new THREE.PlaneGeometry(3, 0.02);
 	var seperatorMaterial = new THREE.MeshBasicMaterial({color: 0xffffff, transparent: true});
 	seperatorMaterial.opacity = 0.8;
 	var seperatorTotal = new THREE.Mesh(seperatorGeometry, seperatorMaterial);
-	seperatorTotal.position.set(0.9, downBy, 0.6);
+	seperatorTotal.position.set(1.2, downBy, 0.6);
 	noteConfCustomGame.add(seperatorTotal);
 	downBy -= 0.25;
 
@@ -853,10 +874,10 @@ function handleShowClickCustomGame(){
 		value = value.toFixed(2);
 	} 
 	var txtTotal = drawText("Total = Rs." + padWithSpace(" ", value, 3), 0xcdcdcd, 0.14, 0.001, fontGeneral, 0.0, true);
-	txtTotal.position.set(0.83, downBy + 0.05, 0.6);
+	txtTotal.position.set(1.33, downBy + 0.05, 0.6);
 	noteConfCustomGame.add(txtTotal);
 
-	noteConfCustomGame.position.set(0.5, 1.9, 0.6);
+	noteConfCustomGame.position.set(0.0, 1.9, 0.6);
 	PIEaddElement(noteConfCustomGame);
 	PIErender();
 }
@@ -932,16 +953,16 @@ function customNoteScene(){
 	seperatorCustomGame = new THREE.Mesh(seperatorGeometry, seperatorMaterial);
 	seperatorCustomGame.position.set(-0.7, 0, 0.6);
 
-	let infoBoxCustomGame1 = drawText("*amount \u2264 1000", 0x19e4e8, 0.12, 0.001, fontGeneral, 0.0, true);
+	let infoBoxCustomGame1 = drawText("*(Amount \u2264 1000", 0x19e4e8, 0.12, 0.001, fontGeneral, 0.0, true);
 	// let infoBoxCustomGame2 = drawText("Click on the SHOW button", 0x19e4e8, 0.12, 0.001, fontGeneral, 0.0, true);
 	// let infoBoxCustomGame3 = drawText("to see a possible composition", 0x19e4e8, 0.12, 0.001, fontGeneral, 0.0, true);
 	// let infoBoxCustomGame4 = drawText("NOTE: For values after", 0x19e4e8, 0.12, 0.001, fontGeneral, 0.0, true);
-	let infoBoxCustomGame2 = drawText("only use .5 or 0.50", 0x19e4e8, 0.12, 0.001, fontGeneral, 0.0, true);
-	let infoBoxCustomGame3 = drawText("for paise after decimal", 0x19e4e8, 0.12, 0.001, fontGeneral, 0.0, true);
+	let infoBoxCustomGame2 = drawText("Use 0.50 for paise after decimal)", 0x19e4e8, 0.12, 0.001, fontGeneral, 0.0, true);
+	// let infoBoxCustomGame3 = drawText("for paise after decimal)", 0x19e4e8, 0.12, 0.001, fontGeneral, 0.0, true);
 
 	infoBoxCustomGame1.position.y = 0;
 	infoBoxCustomGame2.position.y = -0.20;
-	infoBoxCustomGame3.position.y = -0.40;
+	// infoBoxCustomGame3.position.y = -0.40;
 	// infoBoxCustomGame4.position.y = -0.60;
 	// infoBoxCustomGame5.position.y = -0.80;
 	// infoBoxCustomGame6.position.y = -1.00;
@@ -949,7 +970,7 @@ function customNoteScene(){
 	infoBoxCustomGame = new THREE.Group();
 	infoBoxCustomGame.add(infoBoxCustomGame1);
 	infoBoxCustomGame.add(infoBoxCustomGame2);
-	infoBoxCustomGame.add(infoBoxCustomGame3);
+	// infoBoxCustomGame.add(infoBoxCustomGame3);
 	// infoBoxCustomGame.add(infoBoxCustomGame4);
 	// infoBoxCustomGame.add(infoBoxCustomGame5);
 	// infoBoxCustomGame.add(infoBoxCustomGame6);
@@ -1023,7 +1044,7 @@ function handleClickGame2(intersectedBox){
 			updateTotal(-1, toUse);
 		}
 	} else if(intersectedBox < 8){
-		if(eachValueGame2[toUse] == 5){
+		if(eachValueGame2[toUse] == 6){
 			return;
 		} else {
 			eachValueGame2[toUse] += 1;
@@ -1050,7 +1071,7 @@ function updateTotal(addOrSub, index){
 	// amountIndi.position.set(positionsGame2[index].x, positionsGame2[index].y, positionsGame2[index].z);
 	// indiCountGame2[index] = amountIndi;
 	if(eachValueGame2[index] != 0){
-		tenderVarsGame2[index] = showMultiple(tenders[textIndexMapGame2[index]]['img'], eachValueGame2[index], 1.0, 0.01, [0.18, -0.01, 0.01]);
+		tenderVarsGame2[index] = showMultiple(tenders[textIndexMapGame2[index]]['img'], eachValueGame2[index], 1.0, 0.01, [0.3, -0.06, 0.01]);
 	} else {
 		tenderVarsGame2[index] = tenders[textIndexMapGame2[index]]['img'].clone();
 	}
@@ -1102,16 +1123,16 @@ function addGame2(){
 		if(counter >= 4){
 			let tenderClone = (tenders[td]['img']).clone();
 			tenderVarsGame2.push(tenderClone);
-			tenderPositionsGame2.push(new THREE.Vector3(0.7, 1.7 - downBy - 0.3, 1));
-			tenderClone.position.set(0.7, 1.7 - downBy - 0.3, 1);
+			tenderPositionsGame2.push(new THREE.Vector3(0.9, 1.7 - downBy - 0.3, 1));
+			tenderClone.position.set(0.9, 1.7 - downBy - 0.3, 1);
 			tenderClone.material.opacity = 0.3;
 			if(td.startsWith("tender") == false){
 				tenderClone.scale.set(0.65, 0.65, 1);	
 			} else {
 				tenderClone.scale.set(0.6, 0.6, 1);	
 			}
-			buttonsGame2[counter].position.set(2.5, 1.7 - downBy - 0.2, 1);
-			buttonsGame2[8 + counter].position.set(2.5, 1.7 - downBy - 0.4, 1);
+			buttonsGame2[counter].position.set(2.8, 1.7 - downBy - 0.2, 1);
+			buttonsGame2[8 + counter].position.set(2.8, 1.7 - downBy - 0.4, 1);
 			// // let amount = drawText(eachValueGame2[counter], 0xffffff, 0.2, 0.001, fontGeneral, 0.0, true);
 			// let ps = new THREE.Vector3(2.2, 1.7 - downBy - 0.4, 1);
 			// positionsGame2.push(ps);
@@ -1119,16 +1140,16 @@ function addGame2(){
 			// amount.position.set(2.2, 1.7 - downBy - 0.40, 1);
 			// PIEaddElement(amount);
 			// indiCountGame2.push(amount);
-			downBy += 0.8;
+			downBy += 0.85;
 		} else{
 			let tenderClone = (tenders[td]['img']).clone();
 			tenderVarsGame2.push(tenderClone);
-			tenderPositionsGame2.push(new THREE.Vector3(-2, 1.7 - downBy - 0.3, 1));
-			tenderClone.position.set(-2, 1.7 - downBy - 0.3, 1);
+			tenderPositionsGame2.push(new THREE.Vector3(-2.2, 1.7 - downBy - 0.3, 1));
+			tenderClone.position.set(-2.2, 1.7 - downBy - 0.3, 1);
 			tenderClone.material.opacity = 0.3;
 			tenderClone.scale.set(0.65, 0.65, 1);
-			buttonsGame2[counter].position.set(-0.5, 1.7 - downBy - 0.2, 1);
-			buttonsGame2[8 + counter].position.set(-0.5, 1.7 - downBy - 0.4, 1);
+			buttonsGame2[counter].position.set(-0.3, 1.7 - downBy - 0.2, 1);
+			buttonsGame2[8 + counter].position.set(-0.3, 1.7 - downBy - 0.4, 1);
 			// let amount = drawText(eachValueGame2[counter], 0xffffff, 0.2, 0.001, fontGeneral, 0.0, true);
 			// amount.material.opacity = 0.5;
 			// let ps = new THREE.Vector3(-.82, 1.7 - downBy - 0.4, 1);
@@ -1136,7 +1157,7 @@ function addGame2(){
 			// amount.position.set(-.82, 1.7 - downBy - 0.40, 1);
 			// PIEaddElement(amount);
 			// indiCountGame2.push(amount);
-			downBy += 0.8;
+			downBy += 0.85;
 		}
 		PIEaddElement(tenderVarsGame2[counter]);
 		PIEaddElement(buttonsGame2[counter]);
@@ -1243,7 +1264,7 @@ function isGenerateInvoice(){
 }
 
 function drawItemObject(value, objName, position){
-	let textValue = drawText("x " + value, 0x121212, 0.1, 0.001, fontSpecific, 0.0, true);
+	let textValue = drawText(value, 0x121212, 0.1, 0.001, fontSpecific, 0.0, true);
 	let textObject = drawText(objName, 0x121212, 0.1, 0.001, fontSpecific, 0.0, true);
 	let minButton = buttonStyle("-", true);
 	textObject.position.set(position[0], position[1], position[2]);
@@ -1338,7 +1359,7 @@ function doneButtonType(){
 		button.add(doneButtonCover);
 		button.add(doneButtonText);
 	}
-	button.position.set(-2.7, -1.0, 2.6);
+	button.position.set(-2.05, -1.1, 2.6);
 	return button;
 }
 
@@ -1350,7 +1371,7 @@ function drawShop(){
 		let ballMaterial = new THREE.MeshPhongMaterial({color: 0xaaaaaa});
 		let ball = new THREE.Mesh(ballGeometry, ballMaterial);
 		ball.castShadow = true;
-		ball.position.set(-1.5, 1.0, -0.2);
+		ball.position.set(-0.6, 1.0, -0.2);
 
 		let topGeometry = new THREE.CylinderGeometry(0.03, 0.2, 0.5, 20, 3, false);
 		let topPinGeometry = new THREE.ConeGeometry(0.01, 0.1, 10, 3, false);
@@ -1370,7 +1391,7 @@ function drawShop(){
 		top.add(topUp);
 		top.add(topPin);
 		top.add(topTop);
-		top.position.set(.0, 0.85, 0.0);
+		top.position.set(.7, 0.85, 0.0);
 		top.rotation.z = deg2Rad(200);
 		top.rotation.x = deg2Rad(-40);
 
@@ -1398,7 +1419,7 @@ function drawShop(){
 		pencilPin.rotation.z = deg2Rad(180);
 		pencilTip.position.y = -0.45;
 		pencilPin.position.y = -0.55;
-		pencil.position.set(1.5, 0.9, 0.0);
+		pencil.position.set(1.8, 0.9, 0.0);
 
 		pencil.rotation.x = deg2Rad(-50);
 		pencil.rotation.z = deg2Rad(-30);
@@ -1414,7 +1435,7 @@ function drawShop(){
 
 		eraser.rotation.y = deg2Rad(20);
 		eraser.rotation.x = deg2Rad(50);
-		eraser.position.set(-0.7, -0.5, 2.0);
+		eraser.position.set(-0.0, -0.5, 2.0);
 
 		let toffeeGeometry = new THREE.CylinderGeometry(0.1, 0.1, 0.4, 4, 1, false);
 		let toffeeMaterial = new THREE.MeshPhongMaterial({color: 0x3e2fa3});
@@ -1435,7 +1456,7 @@ function drawShop(){
 		toffee.add(toffeeOpen1);
 		toffee.add(toffeeOpen2);
 
-		toffee.position.set(0.6, -0.5, 2.0);
+		toffee.position.set(1.3, -0.5, 2.0);
 
 		shopItems = [];
 		shopItems.push(ball);
@@ -1464,23 +1485,23 @@ function drawShop(){
 	priceVars = [];
 	// priceBall = drawText("Ball-Rs." + priceMap[0], 0xdddddd, 0.13, 0.001, fontGeneral, 0.0, true);
 	priceBall = game3TextBox("Ball-Rs." + priceMap[0], 0.13);
-	priceBall.position.set(-1.76, 0.4, 0.6);
+	priceBall.position.set(-0.90, 0.4, 0.6);
 
 	// priceTop = drawText("Top-Rs." + priceMap[1], 0xdddddd, 0.13, 0.001, fontGeneral, 0.0, true);
 	priceTop = game3TextBox("Top-Rs." + priceMap[1], 0.13);
-	priceTop.position.set(-0.43, 0.3, 0.6);
+	priceTop.position.set(0.23, 0.3, 0.6);
 
 	// pricePencil = drawText("Pencil-Rs." + priceMap[2], 0xdddddd, 0.13, 0.001, fontGeneral, 0.0, true);
 	pricePencil = game3TextBox("Pencil-Rs." + priceMap[2], 0.13);
-	pricePencil.position.set(1.05, 0.2, 0.5);
+	pricePencil.position.set(1.35, 0.2, 0.5);
 
 	// priceEraser = drawText("Eraser-Rs." + (priceMap[3]).toFixed(2), 0xdddddd, 0.115, 0.001, fontGeneral, 0.0, true);
 	priceEraser = game3TextBox("Eraser-Rs." + (priceMap[3]).toFixed(2), 0.11, [1.1, 2]);
-	priceEraser.position.set(-1.15, -0.97, 2.0);
+	priceEraser.position.set(-0.45, -0.97, 2.0);
 
 	// priceCandy = drawText("Candy-Rs." + (priceMap[4]).toFixed(2), 0xdddddd, 0.115, 0.001, fontGeneral, 0.0, true);
 	priceCandy = game3TextBox("Candy-Rs." + (priceMap[4]).toFixed(2), 0.10, [1.1, 1.5]);
-	priceCandy.position.set(0.21, -1.02, 2.0);
+	priceCandy.position.set(0.91, -1.02, 2.0);
 
 	priceVars.push(priceBall);
 	priceVars.push(priceTop);
@@ -1496,24 +1517,49 @@ function drawShop(){
 	billMaterial = new THREE.MeshBasicMaterial({color: 0xffffff, transparent: true});
 	billMaterial.opacity = 0.95;
 	billplateCover = new THREE.Mesh(billplateGeometry, billMaterial);
-	billplateCover.position.set(-2.7, .1, 2.5);
+	billplateCover.position.set(-2.1, .1, 2.5);
 
 	billHeadText = drawText("YOUR  ITEMS", 0x121212, 0.1, 0.001, fontSpecific, 0.0, true);
-	billHeadText.position.set(-3.1, 1.35, 2.6);
+	billHeadText.position.set(-2.60, 1.35, 2.6);
+
+	billHeadItemText = drawText("ITEM", 0x121212, 0.1, 0.001, fontSpecific, 0.0, true);
+	billHeadItemText.position.set(-2.75, 1.1, 2.6);
+
+	billHeadCountText = drawText("COUNT", 0x121212, 0.1, 0.001, fontSpecific, 0.0, true);
+	billHeadCountText.position.set(-2.15, 1.1, 2.6);
+	
+	var horSep1 = new THREE.Mesh(new THREE.PlaneGeometry(1.76, 0.01), new THREE.MeshBasicMaterial({color: 0x232323}));
+	horSep1.position.set(-2.07, 1.24, 2.6);
+	var horSep2 = horSep1.clone();
+	horSep2.position.set(-2.07, 1.07, 2.6);
+	var verSep1 = horSep1.clone();
+	verSep1.rotation.z = deg2Rad(90);
+	verSep1.scale.x = 1.25;
+	// verSep1.scale.y = 0.1;
+	verSep1.position.set(-2.25, 0.15, 2.56);
+	// var verSep2 = verSep1.clone(); 
+	// varSep2.position.set(-);
 
 	billplate = new THREE.Group();
 	billplate.add(billplateCover);
 	billplate.add(billHeadText);
+	billplate.add(billHeadItemText);
+	billplate.add(billHeadCountText);
+	billplate.add(horSep1);
+	billplate.add(horSep2);
+	billplate.add(verSep1);
+	// billplate.add(verSep2);
+	// billplate.position.set(-1.0, );
 	PIEaddElement(billplate);
 	
 	yourItemsGame3Count = [0, 0, 0, 0, 0];
 	yourItemsGame3Obj = [];
 
-	ballItem = drawItemObject(yourItemsGame3Count[0], "Ball", [-3.22, 1.0, 2.9]);
-	topItem = drawItemObject(yourItemsGame3Count[1], "Top", [-3.22, .6, 2.9]);
-	pencilItem = drawItemObject(yourItemsGame3Count[2], "Pencil", [-3.22, 0.2, 2.9]);
-	eraserItem = drawItemObject(yourItemsGame3Count[3], "Eraser", [-3.22, -0.2, 2.9]);
-	candyItem = drawItemObject(yourItemsGame3Count[4], "Candy", [-3.22, -0.6, 2.9]);
+	ballItem = drawItemObject(yourItemsGame3Count[0], "Ball", [-2.6, 0.8, 2.9]);
+	topItem = drawItemObject(yourItemsGame3Count[1], "Top", [-2.6, .4, 2.9]);
+	pencilItem = drawItemObject(yourItemsGame3Count[2], "Pencil", [-2.6, 0.0, 2.9]);
+	eraserItem = drawItemObject(yourItemsGame3Count[3], "Eraser", [-2.6, -0.4, 2.9]);
+	candyItem = drawItemObject(yourItemsGame3Count[4], "Candy", [-2.6, -0.8, 2.9]);
 
 	yourItemsGame3Obj.push(ballItem);
 	yourItemsGame3Obj.push(topItem);
@@ -1570,7 +1616,7 @@ function handleAddItemGame3(index){
 		return;
 	}
 	yourItemsGame3Count[index] += 1;
-	let textValue = drawText("x " + yourItemsGame3Count[index], 0x121212, 0.1, 0.001, fontSpecific, 0.0, true);
+	let textValue = drawText(yourItemsGame3Count[index], 0x121212, 0.1, 0.001, fontSpecific, 0.0, true);
 	PIEremoveElement(yourItemsGame3Obj[index][1]);
 	textValue.position.set(yourItemsGame3Obj[index][3][0] + 0.6, yourItemsGame3Obj[index][3][1], yourItemsGame3Obj[index][3][2]);
 	yourItemsGame3Obj[index][1] = textValue;
@@ -1585,7 +1631,7 @@ function handleRemoveItemGame3(index){
 		return;
 	}
 	yourItemsGame3Count[index] -= 1;
-	let textValue = drawText("x " + yourItemsGame3Count[index], 0x121212, 0.1, 0.001, fontSpecific, 0.0, true);
+	let textValue = drawText(yourItemsGame3Count[index], 0x121212, 0.1, 0.001, fontSpecific, 0.0, true);
 	PIEremoveElement(yourItemsGame3Obj[index][1]);
 	textValue.position.set(yourItemsGame3Obj[index][3][0] + 0.6, yourItemsGame3Obj[index][3][1], yourItemsGame3Obj[index][3][2]);
 	yourItemsGame3Obj[index][1] = textValue;
@@ -1606,23 +1652,26 @@ function removeInvoice(){
 	showingInvoice = false;
 }
 
-function itemForInvoice(index, nameOfItem, quantity, totalPrice, position, fontSize = 0.15){
+function itemForInvoice(index, nameOfItem, quantity, pricePerItem, totalPrice, position, fontSize = 0.15){
 
 	let indexText = drawText(index, 0x333333, fontSize, 0.001, fontSpecific, 0.0, true);
 	let nameItemText = drawText(nameOfItem, 0x333333, fontSize, 0.001, fontSpecific, 0.0, true);
 	let quantityText = drawText(quantity, 0x333333, fontSize, 0.001, fontSpecific, 0.0, true);
+	let perPriceText = drawText(pricePerItem, 0x333333, fontSize, 0.001, fontSpecific, 0.0, true);
 	let totalPriceText = drawText(totalPrice, 0x333333, fontSize, 0.001, fontSpecific, 0.0, true);
 
 	indexText.position.set(position[0], position[1], position[2]);
 	nameItemText.position.set(position[0] + 0.55, position[1], position[2]);
-	quantityText.position.set(position[0] + 2.5, position[1], position[2]);
-	totalPriceText.position.set(position[0] + 3.55, position[1], position[2]);
+	quantityText.position.set(position[0] + 2.0, position[1], position[2]);
+	perPriceText.position.set(position[0] + 2.9, position[1], position[2]);
+	totalPriceText.position.set(position[0] + 3.7, position[1], position[2]);
 
 	let group = new THREE.Group();
 	group.add(indexText);
 	group.add(nameItemText);
 	group.add(quantityText);
 	group.add(totalPriceText);
+	group.add(perPriceText);
 	return group;
 
 }
@@ -1670,12 +1719,14 @@ function handleShowInvoice(){
 	let seperatorIndex = seperatorVert.clone();
 	seperatorIndex.position.x = -2;
 	let seperatorName = seperatorVert.clone();
-	seperatorName.position.x = 0;
+	seperatorName.position.x = -0.6;
 	let seperatorQuantity = seperatorVert.clone();
-	seperatorQuantity.position.x = 1;
+	seperatorQuantity.position.x = 0.4;
+	let seperatorPrice = seperatorVert.clone();
+	seperatorPrice.position.x = 1.2;
 
 	let totalDisplay = drawText("Total", 0x333333, 0.15, 0.001, fontSpecific, 0.0, true);
-	totalDisplay.position.set(-1, -1.8, 3.01);
+	totalDisplay.position.set(0.6, -1.8, 3.01);
 	totalAmountNumeric = (priceMap[0] * yourItemsGame3Count[0] +
 						priceMap[1] * yourItemsGame3Count[1] +
 						priceMap[2] * yourItemsGame3Count[2] +
@@ -1686,7 +1737,7 @@ function handleShowInvoice(){
 		totalAmountNumeric = totalAmountNumeric.toFixed(2);
 	}
 	let totalAmountText = drawText("Rs " + totalAmountNumeric, 0x333333, 0.15, 0.001, fontSpecific, 0.0, true);
-	totalAmountText.position.set(1.2, -1.8, 3.01);
+	totalAmountText.position.set(1.3, -1.8, 3.01);
 	let genDate = new Date();
 
 	let dated = drawText("Dated: " + genDate.getDate() + "/" + genDate.getMonth() + "/" + genDate.getFullYear() , 0x333333, 0.09, 0.001, fontSpecific, 0.0, true);
@@ -1694,7 +1745,7 @@ function handleShowInvoice(){
 
 
 
-	let headersForItems = itemForInvoice("SNo", "Item Name", "Quantity", "Price", [-2.45, 1.3, 3.01]); 
+	let headersForItems = itemForInvoice("SNo", "Item", "Quantity", "Price", "Amount", [-2.45, 1.3, 3.01]); 
 	let itemNames = ['Ball', 'Top', 'Pencil', 'Eraser', 'Candy'];
 	
 	invoice = new THREE.Group();
@@ -1706,7 +1757,7 @@ function handleShowInvoice(){
 			if(ttl - parseInt(ttl) != 0){
 				ttl = ttl.toFixed(2);
 			}
-			let textItem = itemForInvoice(currentIndex, itemNames[i], yourItemsGame3Count[i], ttl, [-2.2, 1. - downBy, 3.01], 0.13);
+			let textItem = itemForInvoice(currentIndex, itemNames[i], yourItemsGame3Count[i], priceMap[i], ttl, [-2.2, 1. - downBy, 3.01], 0.13);
 			currentIndex += 1;
 			invoice.add(textItem);
 			downBy += 0.4;
@@ -1722,14 +1773,16 @@ function handleShowInvoice(){
 	invoice.add(seperatorHeaders);
 	invoice.add(seperatorName);
 	invoice.add(seperatorQuantity);
+	invoice.add(seperatorPrice);
 	invoice.add(seperatorTotal);
 	invoice.add(totalDisplay);
 	invoice.add(totalAmountText);
 	invoice.add(headersForItems);
 	invoice.add(dated);
-	invoice.scale.x = 0.8;
-	invoice.scale.y = 0.8;
-
+	invoice.scale.x = 0.85;
+	invoice.scale.y = 0.85;
+	invoice.position.x = -0.7;
+	// invoice.position.y = 
 	PIEaddElement(invoice);
 }
 
@@ -1959,7 +2012,7 @@ function initialiseInfo()
     infoContent = infoContent + "<h3>Activity 1</h3>";
     infoContent = infoContent + "<p>Activity 1 shows ways in which a certain amount can be build by adding the currency notes</p>";
     infoContent = infoContent + "<h3>Activity 2</h3>";
-    infoContent = infoContent + "<p>Activity 2 allows you to see how adding various currency note values can lead to different amounts. The max available count for each type of currency note is 5 in this case</p>";
+    infoContent = infoContent + "<p>Activity 2 allows you to see how adding various currency note values can lead to different amounts. The max available count for each type of currency note is 6 in this case</p>";
    	infoContent = infoContent + "<h3>Activity 3</h3>";
     infoContent = infoContent + "<p>When you buy items from a store then the bill or invoice is usually given to you.";
     infoContent = infoContent + "Activity 3 shows how this invoice looks.";
