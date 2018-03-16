@@ -1,3 +1,10 @@
+const rs100Color = 0x8fb9c1;
+const rs50Color = 0x42e8f4;
+const rs20Color = 0xaf2853;
+const rs10Color = 0xa35c10;
+const rs5Color = 0x25d1ae;
+const rsCoinColor = 0x707a77;
+const rsCoinWriteColor = 0x555b5a;
 var tenderWidth;
 var tenderHeight;
 var fontCurrency;
@@ -25,199 +32,12 @@ var prevGame;
 var displayGame1Hovers;
 var showingCustomGame;
 
+
 // helper functions
 function deg2Rad(value){
 	return (3.14159265359 / 180) * parseFloat(value);
 }
-
-function padWithSpace(prefix, value, left){
-	let finalNumber = prefix + "" + value + "";
-	let valueInt = parseInt(value);
-	let valueInt2 = parseInt(value);
-	let count = 0;
-	while(valueInt > 0){
-		count+=1;
-		valueInt= parseInt(valueInt/10);
-	}
-	let toAdd = left - count;
-	if(value - valueInt2 != 0 && valueInt2 == 0){
-		toAdd = 2;
-	}
-	if(toAdd != 0){
-		
-		// console.log("For: " + value + " to Add: {" + toAdd + "}");
-		let stringToAdd = "";
-		for(let i = 0; i < toAdd; ++i){
-			stringToAdd += "  ";
-		}
-		finalNumber = stringToAdd + finalNumber;
-	}
-	return finalNumber;
-}
-
-function drawText(text, color, size, height, font, rotation = 0.2, basic = false){
-	let geometry = new THREE.TextGeometry(text, {
-		font : font,
-		size : size,
-		height : height,
-		curveSegments : 10
-	});
-	geometry.computeBoundingBox();
-	let textDrawen = undefined;
-	if(basic == false){
-		textDrawen =new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({color:color, transparent: true}));
-		textDrawen.rotation.y += rotation;
-	} else if(basic == true){
-		textDrawen =new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({color:color, transparent: true}));
-		textDrawen.rotation.y += rotation;
-	}
-	return textDrawen;
-}
-
-function drawCoin(texture){
-	let coinGeometry = new THREE.CircleGeometry(coinRadius, 50);
-	coinGeometry.computeBoundingBox();
-	let coinMaterial = new THREE.MeshPhongMaterial({ map: texture, transparent: true});
-	// coinMaterial.opacity = 0.5;
-	let coinPlate = new THREE.Mesh(coinGeometry, coinMaterial);
-
-	return coinPlate;
-}
-
-function drawTender(texture){
-
-	let coverGeometry = new THREE.PlaneGeometry(tenderWidth, tenderHeight);
-	coverGeometry.computeBoundingBox();
-	let coverMaterialOuter = new THREE.MeshBasicMaterial({map: texture, transparent: true});
-	// coverMaterialOuter.opacity = 0.5;
-	let coverOuter = new THREE.Mesh(coverGeometry, coverMaterialOuter);
-	return coverOuter;
-}
-
-function getShades(color){
-	let rMask = 0xff0000;
-	let gMask = rMask >> 8;
-	let bMask = gMask >> 8;
-
-	let rShift = 16;
-	let gShift = 8;
-	let bShift = 0;
-
-	let rColor = (color & rMask) >> rShift;
-	let gColor = (color & gMask) >> gShift;
-	let bColor = (color & bMask) >> bShift;
-
-	let primaryLightColor;
-	let primaryDarkColor;
-	let secondaryLightColor;
-	let secondaryDarkColor;
-	let mainColor;
-	mainColor = color;
-	if(rColor - 10 >= 0 && gColor - 10 >= 0 && bColor - 10 >= 0){
-		primaryDarkColor = (0x1 << 16) * (rColor - 10) + (0x1 << 8) * (gColor - 10) + (0x1) * (bColor - 10);
-		if(rColor - 20 >= 0 && gColor - 20 >= 0 && bColor - 20 >= 0){
-			secondaryDarkColor = (0x1 << 16) * (rColor - 20) + (0x1 << 8) * (gColor - 20) + (0x1) * (bColor - 20);
-		} else {
-			secondaryDarkColor = primaryDarkColor;
-		}
-	} else {
-		primaryDarkColor = mainColor;
-	}
-
-	if(rColor + 10 <= 255 && gColor + 10 <= 255 && bColor + 10 <= 255){
-		primaryLightColor = (0x1 << 16) * (rColor + 10) + (0x1 << 8) * (gColor + 10) + (0x1) * (bColor + 10);
-		if(rColor + 20 <= 255 && gColor + 20 <= 255 && bColor + 20 <= 255){
-			secondaryLightColor = (0x1 << 16) * (rColor + 20) + (0x1 << 8) * (gColor + 20) + (0x1) * (bColor + 20);
-		} else {
-			secondaryLightColor = primaryLightColor;
-		}
-	} else {
-		primaryLightColor = mainColor;
-	}	
-	shades = {"mainColor": mainColor,
-			"primaryLightColor": primaryLightColor,
-			"secondaryLightColor": secondaryLightColor,
-			"primaryDarkColor": primaryDarkColor,
-			"secondaryDarkColor": secondaryDarkColor
-		}
-
-	return shades;
-}
-
-
-function getRGB(color){
-	let rMask = 0xff0000;
-	let gMask = rMask >> 8;
-	let bMask = gMask >> 8;
-
-	let rShift = 16;
-	let gShift = 8;
-	let bShift = 0;
-
-	let rColor = (color & rMask) >> rShift;
-	let gColor = (color & gMask) >> gShift;
-	let bColor = (color & bMask) >> bShift;
-	return {"r": rColor, "g": gColor, "b": bColor};
-}
-
-function rotateBoard(){
-	board.rotation.y = deg2Rad(boardCurrentSpeed + 0.5 * boardAcceleration);
-	boardCurrentSpeed = boardCurrentSpeed + boardAcceleration;
-	if(board.rotation.y >= deg2Rad(180)){
-		board.rotation.y = deg2Rad(180);
-		boardAcceleration = 0;
-		boardCurrentSpeed = 0;
-		initControls();
-		document.addEventListener('mousedown', onDocumentMouseDown, false);
-		loadGameScene();
-	}
-	PIErender();
-}
-
-function deleteVariable(vari){
-	vari = null;
-}
-
-function alignCenter(elem1, elem2){
-
-	elem1Clone = elem1.clone();
-	elem2Clone = elem2.clone();
-	
-	let elem1bb = new THREE.Box3().setFromObject(elem1Clone);
-	let elem2bb = new THREE.Box3().setFromObject(elem2Clone);
-
-	let elem1CenterX = (elem1bb.min.x + elem1bb.max.x) / 2;
-	let elem1CenterY = (elem1bb.min.y + elem1bb.max.y) / 2;
-	
-	let elem2CenterX = (elem2bb.min.x + elem2bb.max.x) / 2;
-	let elem2CenterY = (elem2bb.min.y + elem2bb.max.y) / 2;
-	
-	elem1Clone.translateX(elem2CenterX - elem1CenterX);
-	elem1Clone.translateY(elem2CenterY - elem1CenterY);
-	
-	return [elem1Clone, elem2Clone];
-}
-
-function showMultiple(obj, count, currentScale = 1.0, reductionFactor = 0.05, incrementFactor = [0.05, -0.05, 0.01]){
-	var cloneObj = obj.clone();
-	cloneObj.scale.x = currentScale - count * reductionFactor;
-	cloneObj.scale.y = currentScale - count * reductionFactor;
-	var group = new THREE.Group();
-	var currentPosition = [0.0, 0.0, 0.0];
-	for(let i = 0; i < count; ++i){
-		let objMult = cloneObj.clone();
-		objMult.position.set(currentPosition[0], currentPosition[1], currentPosition[2]);
-		group.add(objMult);
-		currentPosition[0] = currentPosition[0] + incrementFactor[0];
-		currentPosition[1] = currentPosition[1] + incrementFactor[1];
-		currentPosition[2] = currentPosition[2] + incrementFactor[2];
-		console.log(currentPosition);
-	}
-	return group;
-}
 // -----end of helper functions------------------------
-
-// ------------------------initialise---------------------
 
 function initialiseVariables(){
 	fontCurrency = undefined;
@@ -437,29 +257,365 @@ function runBootStrap(){
 	PIErender();
 }
 
-function buttonStyle(value, blacked = false){
-	let circleGeometry = new THREE.CircleGeometry(0.1, 40);
-	circleGeometry.computeBoundingBox();
-	let circleMaterial;
-	if(blacked == false){
-		circleMaterial = new THREE.MeshBasicMaterial({color: 0xffffff, transparent: true});
-	} else {
-		circleMaterial = new THREE.MeshBasicMaterial({color: 0x333333, transparent: true});
+var isDecimalEntered;
+var textInputCustomGame;
+var textDisplayCustomGame;
+var noteConfCustomGame;
+function handleInputCustomGame1(key){
+	let tempString = textInputCustomGame.slice(0, textInputCustomGame.length);
+	console.log("String length: " + tempString.length + " current String Old: " + tempString);
+	if((key >= '0' && key <= '9') || (key == '.' && isDecimalEntered == false)){
+		if(key == "."){
+			isDecimalEntered = true;
+		}
+		tempString += key;
+		console.log("tempString > " + tempString);
+	} else if( key == 'Backspace' && textInputCustomGame != ""){
+		console.log("To remove: " + tempString[tempString.length - 1]);
+		if(textInputCustomGame[tempString.length - 1] === '.'){
+			console.log("toggling decimal");
+			isDecimalEntered = false;
+		}
+		if(tempString.length == 1){
+			tempString = "";
+		}else {
+			tempString = "" + tempString.substr(0, tempString.length - 1);
+		}
 	}
-	circleMaterial.opacity = 0.6;
-	let circle = new THREE.Mesh(circleGeometry, circleMaterial);
-	let text = drawText(value, 0xffffff, 0.10, 0.001, fontCurrency, 0.0, true);
-	let elems = alignCenter(text, circle);
-	let group = new THREE.Group();
-	group.add(elems[0]);
-	group.add(elems[1]);
-	group.position.z = 1;
+	if(tempString === ""){
+		textInputCustomGame = "";
+		PIEremoveElement(textDisplayCustomGame);
+		textDisplayCustomGame =  drawText(textInputCustomGame + "_", 0x222222, 0.18, 0.001, fontGeneral, 0.0, true);
+		textDisplayCustomGame.position.set(-2.8, 0.9, 0.6);
+		PIEaddElement(textDisplayCustomGame);
+	}else {
+		let value;
+		if(tempString === "" || tempString === ".") value = 0;
+		else{
+			value = parseFloat(tempString);
+			let valueInt = parseInt(value);
+			if(value - valueInt != 0){
+				if(value - valueInt != .5) return;
+				let parts = tempString.split(".");
+				if(parts[1].length > 2) return;
+			} 
+		}	
+		console.log("value parsed :" + value);
+		if(value <= 1000){
+			textInputCustomGame = tempString.slice(0, tempString.length);
+			PIEremoveElement(textDisplayCustomGame);
+			textDisplayCustomGame =  drawText(textInputCustomGame + "_", 0x222222, 0.18, 0.001, fontGeneral, 0.0, true);
+			textDisplayCustomGame.position.set(-2.8, 0.9, 0.6);
+			PIEaddElement(textDisplayCustomGame);
+		}
+	}
+	console.log("String length: " + textInputCustomGame.length + " current String NEW: " + textInputCustomGame);
+	return;
+}
 
-	return group;
+function handleShowClickCustomGame(){
+	if(noteConfCustomGame != null){
+		PIEremoveElement(noteConfCustomGame);
+		PIErender();
+	}
+	console.log("handle click pressed");
+	noteConfCustomGame = new THREE.Group();
+	var toCheckInOrder = ['tender100', 'tender50', 'tender20', 'tender10', 'tender5', 'coin2', 'coin1'];
+	if(textInputCustomGame === "") return;
+	var value = parseFloat(textInputCustomGame);
+	var intPart = parseInt(value);
+	var leftOver = value;
+	var downBy = 0;
+	for(let i = 0; i < toCheckInOrder.length; ++i){
+		let tndr = tenders[toCheckInOrder[i]];
+		let countForThis = parseInt(leftOver / tndr['val']);
+		leftOver = leftOver % tndr['val'];
+		if(countForThis > 0){
+			let imagePart = tndr['img'].clone();
+			imagePart.scale.x = 0.47;
+			imagePart.scale.y = 0.47;
+			imagePart.position.set(0.0, downBy, 0.6);
+			let temp = countForThis * tndr['val'];
+			let times = drawText("x"+countForThis + "= Rs." + padWithSpace(" ", temp, 3), 0xcdcdcd, 0.14, 0.001, fontGeneral, 0.0, true);
+			times.position.set(0.7, downBy - 0.05, 0.6);
+			let grp = new THREE.Group();
+			grp.add(imagePart);
+			grp.add(times);
+			noteConfCustomGame.add(grp);
+			downBy -= 0.49;
+		}
+	}
+	if(value - intPart != 0){
+		let tndr = tenders['coin50p'];
+		let imagePart = tndr['img'].clone();
+			imagePart.scale.x = 0.47;
+			imagePart.scale.y = 0.47;
+			imagePart.position.set(0.0, downBy, 0.6);
+			let times = drawText("x"+1 + "= Rs." + padWithSpace(" ", "0.50", 3), 0xcdcdcd, 0.14, 0.001, fontGeneral, 0.0, true);
+			times.position.set(0.7, downBy - 0.05, 0.6);
+			let grp = new THREE.Group();
+			grp.add(imagePart);
+			grp.add(times);
+			noteConfCustomGame.add(grp);
+			downBy -= 0.49;
+	}
+	downBy += 0.24;
+	var seperatorGeometry = new THREE.PlaneGeometry(3, 0.02);
+	var seperatorMaterial = new THREE.MeshBasicMaterial({color: 0xffffff, transparent: true});
+	seperatorMaterial.opacity = 0.8;
+	var seperatorTotal = new THREE.Mesh(seperatorGeometry, seperatorMaterial);
+	seperatorTotal.position.set(0.7, downBy, 0.6);
+	noteConfCustomGame.add(seperatorTotal);
+	downBy -= 0.25;
+
+	if(value - parseInt(value) != 0){
+		value = value.toFixed(2);
+	} 
+	var txtTotal = drawText("Total = Rs." + padWithSpace(" ", value, 3), 0xcdcdcd, 0.14, 0.001, fontGeneral, 0.0, true);
+	txtTotal.position.set(0.43, downBy, 0.6);
+	noteConfCustomGame.add(txtTotal);
+
+	noteConfCustomGame.position.set(0.5, 1.8, 0.6);
+	PIEaddElement(noteConfCustomGame);
+	PIErender();
+}
+
+function removeCustomGame1(){
+	if(showingCustomGame == false) return;
+	PIEremoveElement(backButton);
+	PIEremoveElement(inputBoxCustomGame);
+	PIEremoveElement(showConfigurationButton);
+	PIEremoveElement(textDisplayCustomGame);
+	PIEremoveElement(seperatorCustomGame);
+	PIEremoveElement(infoBoxCustomGame);
+	PIEremoveElement(writeHereDisplayCustomGame);
+	if(noteConfCustomGame != null){
+		PIEremoveElement(noteConfCustomGame);
+	}
+	showingCustomGame = false;
+	isDecimalEntered = false;
+	document.removeEventListener('keydown', onDocumentKeyPress, false);
+	PIErender();
+}
+
+var backButton;
+var inputBoxCustomGame;
+var showConfigurationButton;
+var seperatorCustomGame;
+var infoBoxCustomGame;
+var writeHereDisplayCustomGame;
+function customNoteScene(){
+	if(showingCustomGame == true) return;
+	// PIEremoveElement(game2CheckBox);
+	console.log("added custom note");
+	removeBoxesGame1();
+	noteConfCustomGame = null;
+	let backButtonText = drawText("< BACK", 0x222222, 0.1, 0.001, fontCurrency, 0.0, true);
+	let backButtonCoverGeometry = new THREE.PlaneGeometry(0.7, 0.3);
+	let backButtonMaterial = new THREE.MeshBasicMaterial({color: 0xdddddd , transparent: true});
+	backButtonMaterial.opacity = 0.8;
+	let backButtonCover = new THREE.Mesh(backButtonCoverGeometry, backButtonMaterial);
+
+	let elems = alignCenter(backButtonText, backButtonCover);
+	backButton = new THREE.Group();
+	backButton.add(elems[0]);
+	backButton.add(elems[1]);
+	backButton.position.set(-2.7, 2, 0.5);
+
+	// let inputBoxHTML = document.createElement('input');
+	// inputBoxHTML.value = "Testing";
+	// let inputBoxCustomGame = new THREE.CSS3DObject(inputBoxHTML);
+	// inputBoxCustomGame.position.set(0, 0, 1.5);
+
+	let inputBoxGeometry = new THREE.PlaneGeometry(2, 0.5);
+	let inputBoxMaterial = new THREE.MeshBasicMaterial({color: 0xffffff, transparent: true});
+	inputBoxMaterial.opacity = 0.7;
+	inputBoxCustomGame = new THREE.Mesh(inputBoxGeometry, inputBoxMaterial);
+	inputBoxCustomGame.position.set(-2.1, 1, 0.5);
+
+	let configurationButtonText = drawText("SHOW", 0xffffff, 0.15, 0.001, fontCurrency, 0.0, true);
+	let configurationButtonCoverGeometry = new THREE.PlaneGeometry(2, 0.5);
+	let configurationButtonMaterial = new THREE.MeshBasicMaterial({color: 0x711c7c});
+	let configurationButtonCover = new THREE.Mesh(configurationButtonCoverGeometry, configurationButtonMaterial);
+
+	elems = alignCenter(configurationButtonText, configurationButtonCover);
+	showConfigurationButton = new THREE.Group();
+	showConfigurationButton.add(elems[0]);
+	showConfigurationButton.add(elems[1]);
+	showConfigurationButton.position.set(-2.1, 0.4, 0.5);
+
+	// PIEremoveElement(textDisplayCustomGame);
+	textInputCustomGame = "";
+	isDecimalEntered = false;
+	textDisplayCustomGame =  drawText(textInputCustomGame + "_", 0x222222, 0.15, 0.001, fontGeneral, 0.0, true);
+	textDisplayCustomGame.position.set(-2.8, 0.9, 0.6);
+
+	let seperatorGeometry = new THREE.PlaneGeometry(0.03, 4);
+	let seperatorMaterial = new THREE.MeshBasicMaterial({color: 0xffffff, transparent: true});
+	seperatorMaterial.opacity = 0.8;
+	seperatorCustomGame = new THREE.Mesh(seperatorGeometry, seperatorMaterial);
+	seperatorCustomGame.position.set(-0.7, 0, 0.6);
+
+	let infoBoxCustomGame1 = drawText("*Write any amount less than 1000", 0x19e4e8, 0.12, 0.001, fontGeneral, 0.0, true);
+	let infoBoxCustomGame2 = drawText("Click on the SHOW button", 0x19e4e8, 0.12, 0.001, fontGeneral, 0.0, true);
+	let infoBoxCustomGame3 = drawText("to see a possible composition", 0x19e4e8, 0.12, 0.001, fontGeneral, 0.0, true);
+	let infoBoxCustomGame4 = drawText("NOTE: For values after", 0x19e4e8, 0.12, 0.001, fontGeneral, 0.0, true);
+	let infoBoxCustomGame5 = drawText("decimal only use .5 or 0.50", 0x19e4e8, 0.12, 0.001, fontGeneral, 0.0, true);
+	let infoBoxCustomGame6 = drawText("for paise", 0x19e4e8, 0.12, 0.001, fontGeneral, 0.0, true);
+
+	infoBoxCustomGame1.position.y = 0;
+	infoBoxCustomGame2.position.y = -0.20;
+	infoBoxCustomGame3.position.y = -0.40;
+	infoBoxCustomGame4.position.y = -0.60;
+	infoBoxCustomGame5.position.y = -0.80;
+	infoBoxCustomGame6.position.y = -1.00;
+
+	infoBoxCustomGame = new THREE.Group();
+	infoBoxCustomGame.add(infoBoxCustomGame1);
+	infoBoxCustomGame.add(infoBoxCustomGame2);
+	infoBoxCustomGame.add(infoBoxCustomGame3);
+	infoBoxCustomGame.add(infoBoxCustomGame4);
+	infoBoxCustomGame.add(infoBoxCustomGame5);
+	infoBoxCustomGame.add(infoBoxCustomGame6);
+
+	infoBoxCustomGame.position.set(-3.1, -0.5, 0.6);
+
+	writeHereDisplayCustomGame = drawText("*WRITE AMOUNT HERE", 0xbbbbbb, 0.10, 0.001, fontCurrency, 0.0, true);
+	writeHereDisplayCustomGame.position.set(-3.07, 1.3, 0.6);
+
+	PIEaddElement(textDisplayCustomGame);
+	PIEaddElement(backButton);
+	PIEaddElement(inputBoxCustomGame);
+	PIEaddElement(showConfigurationButton);
+	PIEaddElement(seperatorCustomGame);
+	PIEaddElement(infoBoxCustomGame);
+	PIEaddElement(writeHereDisplayCustomGame);
+
+	// PIEaddElement(inputBoxCustomGame);
+	showingCustomGame = true;
+	document.addEventListener('keydown', onDocumentKeyPress);
+	PIErender();
+}
+
+function drawText(text, color, size, height, font, rotation = 0.2, basic = false){
+	let geometry = new THREE.TextGeometry(text, {
+		font : font,
+		size : size,
+		height : height,
+		curveSegments : 10
+	});
+	geometry.computeBoundingBox();
+	let textDrawen = undefined;
+	if(basic == false){
+		textDrawen =new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({color:color, transparent: true}));
+		textDrawen.rotation.y += rotation;
+	} else if(basic == true){
+		textDrawen =new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({color:color, transparent: true}));
+		textDrawen.rotation.y += rotation;
+	}
+	return textDrawen;
+}
+
+function drawCoin(texture){
+	let coinGeometry = new THREE.CircleGeometry(coinRadius, 50);
+	coinGeometry.computeBoundingBox();
+	let coinMaterial = new THREE.MeshPhongMaterial({ map: texture, transparent: true});
+	// coinMaterial.opacity = 0.5;
+	let coinPlate = new THREE.Mesh(coinGeometry, coinMaterial);
+
+	return coinPlate;
+}
+
+function drawTender(texture){
+
+	let coverGeometry = new THREE.PlaneGeometry(tenderWidth, tenderHeight);
+	coverGeometry.computeBoundingBox();
+	let coverMaterialOuter = new THREE.MeshBasicMaterial({map: texture, transparent: true});
+	// coverMaterialOuter.opacity = 0.5;
+	let coverOuter = new THREE.Mesh(coverGeometry, coverMaterialOuter);
+	return coverOuter;
+}
+
+function getShades(color){
+	let rMask = 0xff0000;
+	let gMask = rMask >> 8;
+	let bMask = gMask >> 8;
+
+	let rShift = 16;
+	let gShift = 8;
+	let bShift = 0;
+
+	let rColor = (color & rMask) >> rShift;
+	let gColor = (color & gMask) >> gShift;
+	let bColor = (color & bMask) >> bShift;
+
+	let primaryLightColor;
+	let primaryDarkColor;
+	let secondaryLightColor;
+	let secondaryDarkColor;
+	let mainColor;
+	mainColor = color;
+	if(rColor - 10 >= 0 && gColor - 10 >= 0 && bColor - 10 >= 0){
+		primaryDarkColor = (0x1 << 16) * (rColor - 10) + (0x1 << 8) * (gColor - 10) + (0x1) * (bColor - 10);
+		if(rColor - 20 >= 0 && gColor - 20 >= 0 && bColor - 20 >= 0){
+			secondaryDarkColor = (0x1 << 16) * (rColor - 20) + (0x1 << 8) * (gColor - 20) + (0x1) * (bColor - 20);
+		} else {
+			secondaryDarkColor = primaryDarkColor;
+		}
+	} else {
+		primaryDarkColor = mainColor;
+	}
+
+	if(rColor + 10 <= 255 && gColor + 10 <= 255 && bColor + 10 <= 255){
+		primaryLightColor = (0x1 << 16) * (rColor + 10) + (0x1 << 8) * (gColor + 10) + (0x1) * (bColor + 10);
+		if(rColor + 20 <= 255 && gColor + 20 <= 255 && bColor + 20 <= 255){
+			secondaryLightColor = (0x1 << 16) * (rColor + 20) + (0x1 << 8) * (gColor + 20) + (0x1) * (bColor + 20);
+		} else {
+			secondaryLightColor = primaryLightColor;
+		}
+	} else {
+		primaryLightColor = mainColor;
+	}	
+	shades = {"mainColor": mainColor,
+			"primaryLightColor": primaryLightColor,
+			"secondaryLightColor": secondaryLightColor,
+			"primaryDarkColor": primaryDarkColor,
+			"secondaryDarkColor": secondaryDarkColor
+		}
+
+	return shades;
 }
 
 
-// -----------------------activity-1---------------------
+function getRGB(color){
+	let rMask = 0xff0000;
+	let gMask = rMask >> 8;
+	let bMask = gMask >> 8;
+
+	let rShift = 16;
+	let gShift = 8;
+	let bShift = 0;
+
+	let rColor = (color & rMask) >> rShift;
+	let gColor = (color & gMask) >> gShift;
+	let bColor = (color & bMask) >> bShift;
+	return {"r": rColor, "g": gColor, "b": bColor};
+}
+
+function rotateBoard(){
+	board.rotation.y = deg2Rad(boardCurrentSpeed + 0.5 * boardAcceleration);
+	boardCurrentSpeed = boardCurrentSpeed + boardAcceleration;
+	if(board.rotation.y >= deg2Rad(180)){
+		board.rotation.y = deg2Rad(180);
+		boardAcceleration = 0;
+		boardCurrentSpeed = 0;
+		initControls();
+		document.addEventListener('mousedown', onDocumentMouseDown, false);
+		loadGameScene();
+	}
+	PIErender();
+}
+
 var valuesGame1 = {
 	106: {
 		"tender100": 1,
@@ -492,12 +648,32 @@ var valuesGame1 = {
 	}
 }
 var addCustomeValueGame1;
-var boxIndexMap = [106, 110, 73, 59.5, 30, 90];
-var hoverOverText;
-var hoverTextsGame1;
-var boxGame1;
-var boxTriGame1;
+function padWithSpace(prefix, value, left){
+	let finalNumber = prefix + "" + value + "";
+	let valueInt = parseInt(value);
+	let valueInt2 = parseInt(value);
+	let count = 0;
+	while(valueInt > 0){
+		count+=1;
+		valueInt= parseInt(valueInt/10);
+	}
+	let toAdd = left - count;
+	if(value - valueInt2 != 0 && valueInt2 == 0){
+		toAdd = 2;
+	}
+	if(toAdd != 0){
+		
+		// console.log("For: " + value + " to Add: {" + toAdd + "}");
+		let stringToAdd = "";
+		for(let i = 0; i < toAdd; ++i){
+			stringToAdd += "  ";
+		}
+		finalNumber = stringToAdd + finalNumber;
+	}
+	return finalNumber;
+}
 
+var boxIndexMap = [106, 110, 73, 59.5, 30, 90];
 function getTextGame1(value){
 	let group = new THREE.Group();
 	group.position.z = 1.1;
@@ -507,8 +683,7 @@ function getTextGame1(value){
 	group.add(eqlSign);
 	downBy = 0.0;
 	for(key in valuesGame1[value]){
-		// let tndr = tenders[key]["img"].clone();
-		let tndr = showMultiple(tenders[key]["img"], valuesGame1[value][key], 1.0, 0.1, [0.1, -0.1, 0.01]);
+		let tndr = tenders[key]["img"].clone();
 		let temp = tenders[key]['val'] * valuesGame1[value][key];
 		if(temp - parseInt(temp) != 0){
 			temp = temp.toFixed(2);
@@ -565,6 +740,11 @@ function drawBoxGame1(value){
 
 	return group;
 }
+
+var hoverOverText;
+var hoverTextsGame1;
+var boxGame1;
+var boxTriGame1;
 
 function addBoxesGame1(){
 	hoverOverText = drawText("Hover Over a Box to see how to make that sum of money?", 0xedb84e, 0.15, 0.01, fontSpecific, 0.0, true);
@@ -641,6 +821,30 @@ function addBoxesGame1(){
 	PIErender();
 }
 
+function deleteVariable(vari){
+	vari = null;
+}
+
+function alignCenter(elem1, elem2){
+
+	elem1Clone = elem1.clone();
+	elem2Clone = elem2.clone();
+	
+	let elem1bb = new THREE.Box3().setFromObject(elem1Clone);
+	let elem2bb = new THREE.Box3().setFromObject(elem2Clone);
+
+	let elem1CenterX = (elem1bb.min.x + elem1bb.max.x) / 2;
+	let elem1CenterY = (elem1bb.min.y + elem1bb.max.y) / 2;
+	
+	let elem2CenterX = (elem2bb.min.x + elem2bb.max.x) / 2;
+	let elem2CenterY = (elem2bb.min.y + elem2bb.max.y) / 2;
+	
+	elem1Clone.translateX(elem2CenterX - elem1CenterX);
+	elem1Clone.translateY(elem2CenterY - elem1CenterY);
+	
+	return [elem1Clone, elem2Clone];
+}
+
 function removeBoxesGame1(){
 	if(showingCustomGame == true){
 		removeCustomGame1();
@@ -659,6 +863,58 @@ function removeBoxesGame1(){
 	document.removeEventListener('mousemove', onDocumentMouseHover, false);
 	hbNow = null;
 }
+
+function removeBoxesGame2(){
+	let counter = 0;
+	for( let td in tenders ){
+		PIEremoveElement(tenders[td]['img']);
+		PIEremoveElement(buttonsGame2[counter]);
+		PIEremoveElement(buttonsGame2[counter + 8]);
+		counter+=1;
+	}
+	PIEremoveElement(seperator);
+	PIEremoveElement(totalBox);
+	totalSum = 0;
+	for(let i = 0; i < eachValueGame2.length; ++i){
+		eachValueGame2[i] = 0;
+	}
+	for(let i = 0; i < indiCountGame2.length; ++i){
+		PIEremoveElement(indiCountGame2[i]);
+	}
+	let tendersToShow = ['tender100', 'tender50', 'tender20', 'tender10', 'tender5', 'coin2', 'coin1', 'coin50p'];
+	for(let td of tendersToShow){
+		tenders[td]['img'].material.opacity = 1.0;
+	}
+	PIEremoveElement(headTextGame2);
+	headTextGame2 = null;
+}
+
+var hasBoxesGame3;
+function removeBoxesGame3(){
+	bendBoardBool = true;
+	if(hasBoxesGame3 == false) return;
+	PIEremoveElement(pointLight);
+	for(let i = 0; i < priceVars.length; ++i){
+		PIEremoveElement(priceVars[i]);
+	}
+	for(let i = 0; i < shopItems.length; ++i){
+		PIEremoveElement(shopItems[i]);
+		PIEremoveElement(itembbsGame3[i]);
+	}
+	for(let i = 0; i < yourItemsGame3Obj.length; ++i){
+		PIEremoveElement(yourItemsGame3Obj[i][0]);
+		PIEremoveElement(yourItemsGame3Obj[i][1]);
+		PIEremoveElement(yourItemsGame3Obj[i][2]);
+	}
+	if(billplate != undefined){
+		PIEremoveElement(billplate);
+	}
+	PIEremoveElement(doneButton);
+	removeInvoice();
+	PIEremoveElement(clickOnItemText);
+	hasBoxesGame3 = false;
+}
+
 
 function handleHover(boxValue, removeBox = false){
 	if(removeBox == true){
@@ -680,6 +936,58 @@ function handleHover(boxValue, removeBox = false){
 		currentDisp = boxValue;
 		PIErender();
 	}
+}
+
+
+function handleClickGame2(intersectedBox){
+	let toUse = (intersectedBox % 8);
+	if(intersectedBox >= 8){
+		if(eachValueGame2[toUse] == 0){
+			return;
+		} else {
+			eachValueGame2[toUse] -= 1;
+			updateTotal(-1, toUse);
+		}
+	} else if(intersectedBox < 8){
+		if(eachValueGame2[toUse] == 5){
+			return;
+		} else {
+			eachValueGame2[toUse] += 1;
+			updateTotal(1, toUse);
+		}
+	}
+}
+
+function updateTotal(addOrSub, index){
+	// if(totalBox == null) return;
+	let amount = valueIndexMapGame2[index];
+	PIEremoveElement(totalBox);
+	PIEremoveElement(indiCountGame2[index]);
+
+	totalSum = totalSum + addOrSub * amount;
+	let dispSum = totalSum;
+	if(totalSum - parseInt(totalSum) != 0){
+		dispSum = totalSum.toFixed(2);
+	}
+	totalBox = drawText("Total = Rs. " + dispSum, 0xffffff, 0.15, 0.001, fontGeneral, 0, true);
+
+	let amountIndi = drawText(eachValueGame2[index], 0xffffff, 0.20, 0.001, fontGeneral, 0.0, true);
+
+	amountIndi.position.set(positionsGame2[index].x, positionsGame2[index].y, positionsGame2[index].z);
+	indiCountGame2[index] = amountIndi;
+
+	if(eachValueGame2[index] > 0){
+		indiCountGame2[index].material.opacity = 1.0;
+		tenders[textIndexMapGame2[index]]['img'].material.opacity = 1.0;
+	} else {
+		tenders[textIndexMapGame2[index]]['img'].material.opacity = 0.3;
+		indiCountGame2[index].material.opacity = 0.5;
+	}
+
+	PIEaddElement(indiCountGame2[index]);
+	
+	totalBox.position.set(positionsGame2[8].x, positionsGame2[8].y, positionsGame2[8].z);
+	PIEaddElement(totalBox);
 }
 
 function hoverBox(length, height, boxValue){
@@ -727,255 +1035,42 @@ function hoverBox(length, height, boxValue){
 	return group;
 }
 
-
-
-
-// -----------------------activity-1--custom-game---------------------
-var isDecimalEntered;
-var textInputCustomGame;
-var textDisplayCustomGame;
-var noteConfCustomGame;
-var backButton;
-var inputBoxCustomGame;
-var showConfigurationButton;
-var seperatorCustomGame;
-var infoBoxCustomGame;
-var writeHereDisplayCustomGame;
-
-function handleInputCustomGame1(key){
-	let tempString = textInputCustomGame.slice(0, textInputCustomGame.length);
-	console.log("String length: " + tempString.length + " current String Old: " + tempString);
-	if((key >= '0' && key <= '9') || (key == '.' && isDecimalEntered == false)){
-		if(key == "."){
-			isDecimalEntered = true;
-		}
-		tempString += key;
-		console.log("tempString > " + tempString);
-	} else if( key == 'Backspace' && textInputCustomGame != ""){
-		console.log("To remove: " + tempString[tempString.length - 1]);
-		if(textInputCustomGame[tempString.length - 1] === '.'){
-			console.log("toggling decimal");
-			isDecimalEntered = false;
-		}
-		if(tempString.length == 1){
-			tempString = "";
-		}else {
-			tempString = "" + tempString.substr(0, tempString.length - 1);
-		}
+function loadGameScene(){
+	if(currentGame == 1){
+		displayingNow = false;
+		currentDisp = -1;
+		hbNow = null;
+		addBoxesGame1();
+	} else if(currentGame == 2){
+		// console.log(currentGame);
+		addGame2();
+	} else if(currentGame == 3){
+		// console.log(currentGame);
+		addGame3();
 	}
-	if(tempString === ""){
-		textInputCustomGame = "";
-		PIEremoveElement(textDisplayCustomGame);
-		textDisplayCustomGame =  drawText(textInputCustomGame + "_", 0x222222, 0.18, 0.001, fontGeneral, 0.0, true);
-		textDisplayCustomGame.position.set(-2.8, 0.9, 0.6);
-		PIEaddElement(textDisplayCustomGame);
-	}else {
-		let value;
-		if(tempString === "" || tempString === ".") value = 0;
-		else{
-			value = parseFloat(tempString);
-			let valueInt = parseInt(value);
-			if(value - valueInt != 0){
-				if(value - valueInt != .5) return;
-				let parts = tempString.split(".");
-				if(parts[1].length > 2) return;
-			} 
-		}	
-		console.log("value parsed :" + value);
-		if(value <= 1000){
-			textInputCustomGame = tempString.slice(0, tempString.length);
-			PIEremoveElement(textDisplayCustomGame);
-			textDisplayCustomGame =  drawText(textInputCustomGame + "_", 0x222222, 0.18, 0.001, fontGeneral, 0.0, true);
-			textDisplayCustomGame.position.set(-2.8, 0.9, 0.6);
-			PIEaddElement(textDisplayCustomGame);
-		}
-	}
-	console.log("String length: " + textInputCustomGame.length + " current String NEW: " + textInputCustomGame);
-	return;
 }
 
-function handleShowClickCustomGame(){
-	if(noteConfCustomGame != null){
-		PIEremoveElement(noteConfCustomGame);
-		PIErender();
+function buttonStyle(value, blacked = false){
+	let circleGeometry = new THREE.CircleGeometry(0.1, 40);
+	circleGeometry.computeBoundingBox();
+	let circleMaterial;
+	if(blacked == false){
+		circleMaterial = new THREE.MeshBasicMaterial({color: 0xffffff, transparent: true});
+	} else {
+		circleMaterial = new THREE.MeshBasicMaterial({color: 0x333333, transparent: true});
 	}
-	console.log("handle click pressed");
-	noteConfCustomGame = new THREE.Group();
-	var toCheckInOrder = ['tender100', 'tender50', 'tender20', 'tender10', 'tender5', 'coin2', 'coin1'];
-	if(textInputCustomGame === "") return;
-	var value = parseFloat(textInputCustomGame);
-	var intPart = parseInt(value);
-	var leftOver = value;
-	var downBy = 0;
-	for(let i = 0; i < toCheckInOrder.length; ++i){
-		let tndr = tenders[toCheckInOrder[i]];
-		let countForThis = parseInt(leftOver / tndr['val']);
-		leftOver = leftOver % tndr['val'];
-		if(countForThis > 0){
-			let imagePart = showMultiple(tndr['img'].clone(), countForThis, 1.0, 0.01, [0.08, -0.01, 0.01]); //, 1.0, 0.05, [0.1, -0.01, 0.1]);
-			imagePart.scale.x = 0.47;
-			imagePart.scale.y = 0.47;
-			imagePart.position.set(0.0, downBy, 0.6);
-			let temp = countForThis * tndr['val'];
-			let times = drawText("x"+countForThis + "= Rs." + padWithSpace(" ", temp, 3), 0xcdcdcd, 0.14, 0.001, fontGeneral, 0.0, true);
-			times.position.set(0.9, downBy - 0.05, 0.6);
-			let grp = new THREE.Group();
-			grp.add(imagePart);
-			grp.add(times);
-			noteConfCustomGame.add(grp);
-			downBy -= 0.51;
-		}
-	}
-	if(value - intPart != 0){
-		let tndr = tenders['coin50p'];
-		let imagePart = tndr['img'].clone();
-			imagePart.scale.x = 0.47;
-			imagePart.scale.y = 0.47;
-			imagePart.position.set(0.0, downBy, 0.6);
-			let times = drawText("x"+1 + "= Rs." + padWithSpace(" ", "0.50", 3), 0xcdcdcd, 0.14, 0.001, fontGeneral, 0.0, true);
-			times.position.set(0.9, downBy - 0.05, 0.6);
-			let grp = new THREE.Group();
-			grp.add(imagePart);
-			grp.add(times);
-			noteConfCustomGame.add(grp);
-			downBy -= 0.51;
-	}
-	downBy += 0.24;
-	var seperatorGeometry = new THREE.PlaneGeometry(3, 0.02);
-	var seperatorMaterial = new THREE.MeshBasicMaterial({color: 0xffffff, transparent: true});
-	seperatorMaterial.opacity = 0.8;
-	var seperatorTotal = new THREE.Mesh(seperatorGeometry, seperatorMaterial);
-	seperatorTotal.position.set(0.9, downBy, 0.6);
-	noteConfCustomGame.add(seperatorTotal);
-	downBy -= 0.25;
+	circleMaterial.opacity = 0.6;
+	let circle = new THREE.Mesh(circleGeometry, circleMaterial);
+	let text = drawText(value, 0xffffff, 0.10, 0.001, fontCurrency, 0.0, true);
+	let elems = alignCenter(text, circle);
+	let group = new THREE.Group();
+	group.add(elems[0]);
+	group.add(elems[1]);
+	group.position.z = 1;
 
-	if(value - parseInt(value) != 0){
-		value = value.toFixed(2);
-	} 
-	var txtTotal = drawText("Total = Rs." + padWithSpace(" ", value, 3), 0xcdcdcd, 0.14, 0.001, fontGeneral, 0.0, true);
-	txtTotal.position.set(0.63, downBy + 0.05, 0.6);
-	noteConfCustomGame.add(txtTotal);
-
-	noteConfCustomGame.position.set(0.5, 1.85, 0.6);
-	PIEaddElement(noteConfCustomGame);
-	PIErender();
+	return group;
 }
 
-function removeCustomGame1(){
-	if(showingCustomGame == false) return;
-	PIEremoveElement(backButton);
-	PIEremoveElement(inputBoxCustomGame);
-	PIEremoveElement(showConfigurationButton);
-	PIEremoveElement(textDisplayCustomGame);
-	PIEremoveElement(seperatorCustomGame);
-	PIEremoveElement(infoBoxCustomGame);
-	PIEremoveElement(writeHereDisplayCustomGame);
-	if(noteConfCustomGame != null){
-		PIEremoveElement(noteConfCustomGame);
-	}
-	showingCustomGame = false;
-	isDecimalEntered = false;
-	document.removeEventListener('keydown', onDocumentKeyPress, false);
-	PIErender();
-}
-
-
-function customNoteScene(){
-	if(showingCustomGame == true) return;
-	// PIEremoveElement(game2CheckBox);
-	console.log("added custom note");
-	removeBoxesGame1();
-	noteConfCustomGame = null;
-	let backButtonText = drawText("< BACK", 0x222222, 0.1, 0.001, fontCurrency, 0.0, true);
-	let backButtonCoverGeometry = new THREE.PlaneGeometry(0.7, 0.3);
-	let backButtonMaterial = new THREE.MeshBasicMaterial({color: 0xdddddd , transparent: true});
-	backButtonMaterial.opacity = 0.8;
-	let backButtonCover = new THREE.Mesh(backButtonCoverGeometry, backButtonMaterial);
-
-	let elems = alignCenter(backButtonText, backButtonCover);
-	backButton = new THREE.Group();
-	backButton.add(elems[0]);
-	backButton.add(elems[1]);
-	backButton.position.set(-2.7, 2, 0.5);
-
-	// let inputBoxHTML = document.createElement('input');
-	// inputBoxHTML.value = "Testing";
-	// let inputBoxCustomGame = new THREE.CSS3DObject(inputBoxHTML);
-	// inputBoxCustomGame.position.set(0, 0, 1.5);
-
-	let inputBoxGeometry = new THREE.PlaneGeometry(2, 0.5);
-	let inputBoxMaterial = new THREE.MeshBasicMaterial({color: 0xffffff, transparent: true});
-	inputBoxMaterial.opacity = 0.7;
-	inputBoxCustomGame = new THREE.Mesh(inputBoxGeometry, inputBoxMaterial);
-	inputBoxCustomGame.position.set(-2.1, 1, 0.5);
-
-	let configurationButtonText = drawText("SHOW", 0xffffff, 0.15, 0.001, fontCurrency, 0.0, true);
-	let configurationButtonCoverGeometry = new THREE.PlaneGeometry(2, 0.5);
-	let configurationButtonMaterial = new THREE.MeshBasicMaterial({color: 0x711c7c});
-	let configurationButtonCover = new THREE.Mesh(configurationButtonCoverGeometry, configurationButtonMaterial);
-
-	elems = alignCenter(configurationButtonText, configurationButtonCover);
-	showConfigurationButton = new THREE.Group();
-	showConfigurationButton.add(elems[0]);
-	showConfigurationButton.add(elems[1]);
-	showConfigurationButton.position.set(-2.1, 0.4, 0.5);
-
-	// PIEremoveElement(textDisplayCustomGame);
-	textInputCustomGame = "";
-	isDecimalEntered = false;
-	textDisplayCustomGame =  drawText(textInputCustomGame + "_", 0x222222, 0.15, 0.001, fontGeneral, 0.0, true);
-	textDisplayCustomGame.position.set(-2.8, 0.9, 0.6);
-
-	let seperatorGeometry = new THREE.PlaneGeometry(0.03, 4);
-	let seperatorMaterial = new THREE.MeshBasicMaterial({color: 0xffffff, transparent: true});
-	seperatorMaterial.opacity = 0.8;
-	seperatorCustomGame = new THREE.Mesh(seperatorGeometry, seperatorMaterial);
-	seperatorCustomGame.position.set(-0.7, 0, 0.6);
-
-	let infoBoxCustomGame1 = drawText("*amount \u2264 1000", 0x19e4e8, 0.12, 0.001, fontGeneral, 0.0, true);
-	// let infoBoxCustomGame2 = drawText("Click on the SHOW button", 0x19e4e8, 0.12, 0.001, fontGeneral, 0.0, true);
-	// let infoBoxCustomGame3 = drawText("to see a possible composition", 0x19e4e8, 0.12, 0.001, fontGeneral, 0.0, true);
-	// let infoBoxCustomGame4 = drawText("NOTE: For values after", 0x19e4e8, 0.12, 0.001, fontGeneral, 0.0, true);
-	let infoBoxCustomGame2 = drawText("only use .5 or 0.50", 0x19e4e8, 0.12, 0.001, fontGeneral, 0.0, true);
-	let infoBoxCustomGame3 = drawText("for paise after decimal", 0x19e4e8, 0.12, 0.001, fontGeneral, 0.0, true);
-
-	infoBoxCustomGame1.position.y = 0;
-	infoBoxCustomGame2.position.y = -0.20;
-	infoBoxCustomGame3.position.y = -0.40;
-	// infoBoxCustomGame4.position.y = -0.60;
-	// infoBoxCustomGame5.position.y = -0.80;
-	// infoBoxCustomGame6.position.y = -1.00;
-
-	infoBoxCustomGame = new THREE.Group();
-	infoBoxCustomGame.add(infoBoxCustomGame1);
-	infoBoxCustomGame.add(infoBoxCustomGame2);
-	infoBoxCustomGame.add(infoBoxCustomGame3);
-	// infoBoxCustomGame.add(infoBoxCustomGame4);
-	// infoBoxCustomGame.add(infoBoxCustomGame5);
-	// infoBoxCustomGame.add(infoBoxCustomGame6);
-
-	infoBoxCustomGame.position.set(-3.1, -0.5, 0.6);
-
-	writeHereDisplayCustomGame = drawText("*WRITE AMOUNT HERE", 0xbbbbbb, 0.10, 0.001, fontCurrency, 0.0, true);
-	writeHereDisplayCustomGame.position.set(-3.07, 1.3, 0.6);
-
-	PIEaddElement(textDisplayCustomGame);
-	PIEaddElement(backButton);
-	PIEaddElement(inputBoxCustomGame);
-	PIEaddElement(showConfigurationButton);
-	PIEaddElement(seperatorCustomGame);
-	PIEaddElement(infoBoxCustomGame);
-	PIEaddElement(writeHereDisplayCustomGame);
-
-	// PIEaddElement(inputBoxCustomGame);
-	showingCustomGame = true;
-	document.addEventListener('keydown', onDocumentKeyPress);
-	PIErender();
-}
-
-
-
-// -----------------------activity-2---------------------
 var buttonsGame2 = undefined;
 var seperator = undefined;
 var totalSum = 0;
@@ -984,96 +1079,8 @@ var indiCountGame2 = undefined;
 const textIndexMapGame2 = ['tender100', 'tender50', 'tender20', 'tender10', 'tender5', 'coin2', 'coin1', 'coin50p'];
 const valueIndexMapGame2 = [100, 50, 20, 10, 5, 2, 1, 0.50];
 var eachValueGame2 = [0, 0, 0, 0, 0, 0, 0, 0];
-var tenderPositionsGame2;
 var positionsGame2 = undefined;
 var headTextGame2;
-var tenderVarsGame2;
-function removeBoxesGame2(){
-	let counter = 0;
-	for( let i = 0; i < textIndexMapGame2.length; ++i){
-		PIEremoveElement(buttonsGame2[i]);
-		PIEremoveElement(buttonsGame2[i + 8]);
-	}
-	PIEremoveElement(seperator);
-	PIEremoveElement(totalBox);
-	totalSum = 0;
-	for(let i = 0; i < eachValueGame2.length; ++i){
-		eachValueGame2[i] = 0;
-	}
-	for(let i = 0; i < indiCountGame2.length; ++i){
-		PIEremoveElement(indiCountGame2[i]);
-	}
-	for(let td of tenderVarsGame2){
-		PIEremoveElement(td);
-	}
-	PIEremoveElement(headTextGame2);
-	headTextGame2 = null;
-}
-
-
-function handleClickGame2(intersectedBox){
-	let toUse = (intersectedBox % 8);
-	if(intersectedBox >= 8){
-		if(eachValueGame2[toUse] == 0){
-			return;
-		} else {
-			eachValueGame2[toUse] -= 1;
-			updateTotal(-1, toUse);
-		}
-	} else if(intersectedBox < 8){
-		if(eachValueGame2[toUse] == 5){
-			return;
-		} else {
-			eachValueGame2[toUse] += 1;
-			updateTotal(1, toUse);
-		}
-	}
-}
-
-function updateTotal(addOrSub, index){
-	// if(totalBox == null) return;
-	let amount = valueIndexMapGame2[index];
-	PIEremoveElement(totalBox);
-	PIEremoveElement(indiCountGame2[index]);
-	PIEremoveElement(tenderVarsGame2[index]);
-	totalSum = totalSum + addOrSub * amount;
-	let dispSum = totalSum;
-	if(totalSum - parseInt(totalSum) != 0){
-		dispSum = totalSum.toFixed(2);
-	}
-	totalBox = drawText("Total = Rs. " + dispSum, 0xffffff, 0.15, 0.001, fontGeneral, 0, true);
-
-	let amountIndi = drawText(eachValueGame2[index], 0xffffff, 0.20, 0.001, fontGeneral, 0.0, true);
-
-	amountIndi.position.set(positionsGame2[index].x, positionsGame2[index].y, positionsGame2[index].z);
-	indiCountGame2[index] = amountIndi;
-	if(eachValueGame2[index] != 0){
-		tenderVarsGame2[index] = showMultiple(tenders[textIndexMapGame2[index]]['img'], eachValueGame2[index], 1.0, 0.05, [0.1, -0.01, 0.01]);
-	} else {
-		tenderVarsGame2[index] = tenders[textIndexMapGame2[index]]['img'].clone();
-	}
-	if(textIndexMapGame2[index].startsWith('tender')){
-		tenderVarsGame2[index].scale.set(0.65, 0.65, 1.0);
-	} else {
-		tenderVarsGame2[index].scale.set(0.6, 0.6, 0.1);
-	}
-	tenderVarsGame2[index].position.set(tenderPositionsGame2[index].x, tenderPositionsGame2[index].y, tenderPositionsGame2[index].z);
-	if(eachValueGame2[index] > 0){
-		indiCountGame2[index].material.opacity = 1.0;
-		tenders[textIndexMapGame2[index]]['img'].material.opacity = 1.0;
-
-	} else {
-		tenders[textIndexMapGame2[index]]['img'].material.opacity = 0.3;
-		indiCountGame2[index].material.opacity = 0.5;
-	}
-
-	PIEaddElement(indiCountGame2[index]);
-	PIEaddElement(tenderVarsGame2[index]);
-	totalBox.position.set(positionsGame2[8].x, positionsGame2[8].y, positionsGame2[8].z);
-	PIEaddElement(totalBox);
-}
-
-
 function addGame2(){
 	if(buttonsGame2 == undefined || buttonsGame2.length != 16){
 		let plus = buttonStyle("+");
@@ -1092,21 +1099,16 @@ function addGame2(){
 	let downBy = 0;
 	indiCountGame2 = [];
 	positionsGame2 = [];
-	tenderVarsGame2 = [];
-	tenderPositionsGame2 = [];
 	let tendersToShow = ['tender100', 'tender50', 'tender20', 'tender10', 'tender5', 'coin2', 'coin1', 'coin50p'];
 	for(let counter = 0; counter < tendersToShow.length; ++counter){
 		let td = tendersToShow[counter];
 		if(counter >= 4){
-			let tenderClone = (tenders[td]['img']).clone();
-			tenderVarsGame2.push(tenderClone);
-			tenderPositionsGame2.push(new THREE.Vector3(0.7, 1.7 - downBy - 0.3, 1));
-			tenderClone.position.set(0.7, 1.7 - downBy - 0.3, 1);
-			tenderClone.material.opacity = 0.3;
-			if(td.startsWith("tender") == false){
-				tenderClone.scale.set(0.65, 0.65, 1);	
+			tenders[td]['img'].position.set(0.7, 1.7 - downBy - 0.3, 1);
+			tenders[td]['img'].material.opacity = 0.3;
+			if(td.startsWith("tender") == true){
+				tenders[td]['img'].scale.set(0.6, 0.6, 1);	
 			} else {
-				tenderClone.scale.set(0.6, 0.6, 1);	
+				tenders[td]['img'].scale.set(0.7, 0.7, 1);	
 			}
 			buttonsGame2[counter].position.set(2.0, 1.7 - downBy - 0.3, 1);
 			buttonsGame2[8 + counter].position.set(2.5, 1.7 - downBy - 0.3, 1);
@@ -1119,12 +1121,9 @@ function addGame2(){
 			indiCountGame2.push(amount);
 			downBy += 0.8;
 		} else{
-			let tenderClone = (tenders[td]['img']).clone();
-			tenderVarsGame2.push(tenderClone);
-			tenderPositionsGame2.push(new THREE.Vector3(-2, 1.7 - downBy - 0.3, 1));
-			tenderClone.position.set(-2, 1.7 - downBy - 0.3, 1);
-			tenderClone.material.opacity = 0.3;
-			tenderClone.scale.set(0.65, 0.65, 1);
+			tenders[td]['img'].position.set(-2, 1.7 - downBy - 0.3, 1);
+			tenders[td]['img'].material.opacity = 0.3;
+			tenders[td]['img'].scale.set(0.65, 0.65, 1);
 			buttonsGame2[counter].position.set(-1.0, 1.7 - downBy - 0.3, 1);
 			buttonsGame2[8 + counter].position.set(-0.5, 1.7 - downBy - 0.3, 1);
 			let amount = drawText(eachValueGame2[counter], 0xffffff, 0.2, 0.001, fontGeneral, 0.0, true);
@@ -1136,7 +1135,8 @@ function addGame2(){
 			indiCountGame2.push(amount);
 			downBy += 0.8;
 		}
-		PIEaddElement(tenderVarsGame2[counter]);
+		
+		PIEaddElement(tenders[td]["img"]);
 		PIEaddElement(buttonsGame2[counter]);
 		PIEaddElement(buttonsGame2[8+counter]);
 		if(counter == 3){
@@ -1168,35 +1168,6 @@ function addGame2(){
 	PIEaddElement(totalBox);
 	PIEaddElement(seperator);
 	PIErender();
-}
-
-// -----------------------activity-3---------------------
-
-
-var hasBoxesGame3;
-function removeBoxesGame3(){
-	bendBoardBool = true;
-	if(hasBoxesGame3 == false) return;
-	PIEremoveElement(pointLight);
-	for(let i = 0; i < priceVars.length; ++i){
-		PIEremoveElement(priceVars[i]);
-	}
-	for(let i = 0; i < shopItems.length; ++i){
-		PIEremoveElement(shopItems[i]);
-		PIEremoveElement(itembbsGame3[i]);
-	}
-	for(let i = 0; i < yourItemsGame3Obj.length; ++i){
-		PIEremoveElement(yourItemsGame3Obj[i][0]);
-		PIEremoveElement(yourItemsGame3Obj[i][1]);
-		PIEremoveElement(yourItemsGame3Obj[i][2]);
-	}
-	if(billplate != undefined){
-		PIEremoveElement(billplate);
-	}
-	PIEremoveElement(doneButton);
-	removeInvoice();
-	PIEremoveElement(clickOnItemText);
-	hasBoxesGame3 = false;
 }
 
 var shopItems;
@@ -1246,7 +1217,7 @@ function drawItemObject(value, objName, position){
 	return [textObject, textValue, minButton, position];
 }
 
-function getRestructuredBoundingBox(obj, scalex = 1.8, scaley = 1.5, boxOnly = false){
+function getRestructuredBoundingBox(obj, scalex = 1.8, scaley = 1.5){
 	let bb = new THREE.Box3().setFromObject(obj);
 	let Xwidth = bb.max.x - bb.min.x;
 	let Ywidth = bb.max.y - bb.min.y;
@@ -1520,6 +1491,8 @@ function drawShop(){
 		PIEaddElement(yourItemsGame3Obj[i][1]);
 		PIEaddElement(yourItemsGame3Obj[i][2]);
 	}
+
+	
 
 	doneButton = doneButtonType();
 
@@ -1953,19 +1926,4 @@ function initialiseInfo()
    
     infoContent = infoContent + "<h2>Happy Experimenting</h2>";
     PIEupdateInfo(infoContent);
-}
-
-function loadGameScene(){
-	if(currentGame == 1){
-		displayingNow = false;
-		currentDisp = -1;
-		hbNow = null;
-		addBoxesGame1();
-	} else if(currentGame == 2){
-		// console.log(currentGame);
-		addGame2();
-	} else if(currentGame == 3){
-		// console.log(currentGame);
-		addGame3();
-	}
 }
