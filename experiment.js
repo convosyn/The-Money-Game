@@ -508,14 +508,14 @@ function getTextGame1(value){
 	downBy = 0.0;
 	for(key in valuesGame1[value]){
 		// let tndr = tenders[key]["img"].clone();
-		let tndr = showMultiple(tenders[key]["img"], valuesGame1[value][key], 1.0, 0.1, [0.1, -0.1, 0.01]);
+		let tndr = showMultiple(tenders[key]["img"], valuesGame1[value][key], 1.0, 0.1, [0.2, -0.15, 0.01]);
 		let temp = tenders[key]['val'] * valuesGame1[value][key];
 		if(temp - parseInt(temp) != 0){
 			temp = temp.toFixed(2);
 		}
-		let times = drawText("x"+valuesGame1[value][key] + "= Rs." + padWithSpace(" ", temp, 3), 0x121212, 0.16, 0.001, fontGeneral, 0.0, true);
+		let times = drawText("= Rs." + padWithSpace(" ", temp, 3), 0x121212, 0.16, 0.001, fontGeneral, 0.0, true);
 		tndr.position.set(-0.3, 1.3 - downBy, 1);
-		times.position.set(0.2, 1.3 - downBy - 0.05, 1);
+		times.position.set(0.3, 1.3 - downBy - 0.05, 1);
 		tndr.scale.x = 0.4;
 		tndr.scale.y = 0.4;
 		group.add(tndr);
@@ -535,8 +535,8 @@ function getTextGame1(value){
 	ttl.position.x = 0.56;
 	ttl.position.y = 1.3 - downBy - 0.15;
 	ttl.position.z = 1;
-	let ttlString = drawText("Total  = ", 0x121212, 0.15, 0.001, fontGeneral, 0.0, true);
-	ttlString.position.x = -0.16;
+	let ttlString = drawText("total  = ", 0x121212, 0.15, 0.001, fontGeneral, 0.0, true);
+	ttlString.position.x = -0.06;
 	ttlString.position.y = 1.3 - downBy - 0.15;
 	ttlString.position.z = 1;
 	group.add(bx);
@@ -812,13 +812,13 @@ function handleShowClickCustomGame(){
 		let countForThis = parseInt(leftOver / tndr['val']);
 		leftOver = leftOver % tndr['val'];
 		if(countForThis > 0){
-			let imagePart = showMultiple(tndr['img'].clone(), countForThis, 1.0, 0.01, [0.08, -0.01, 0.01]); //, 1.0, 0.05, [0.1, -0.01, 0.1]);
+			let imagePart = showMultiple(tndr['img'].clone(), countForThis, 1.0, 0.01, [0.22, -0.015, 0.01]); //, 1.0, 0.05, [0.1, -0.01, 0.1]);
 			imagePart.scale.x = 0.47;
 			imagePart.scale.y = 0.47;
 			imagePart.position.set(0.0, downBy, 0.6);
 			let temp = countForThis * tndr['val'];
-			let times = drawText("x"+countForThis + "= Rs." + padWithSpace(" ", temp, 3), 0xcdcdcd, 0.14, 0.001, fontGeneral, 0.0, true);
-			times.position.set(0.9, downBy - 0.05, 0.6);
+			let times = drawText("= Rs." + padWithSpace(" ", temp, 3), 0xcdcdcd, 0.14, 0.001, fontGeneral, 0.0, true);
+			times.position.set(1.3, downBy - 0.05, 0.6);
 			let grp = new THREE.Group();
 			grp.add(imagePart);
 			grp.add(times);
@@ -853,10 +853,10 @@ function handleShowClickCustomGame(){
 		value = value.toFixed(2);
 	} 
 	var txtTotal = drawText("Total = Rs." + padWithSpace(" ", value, 3), 0xcdcdcd, 0.14, 0.001, fontGeneral, 0.0, true);
-	txtTotal.position.set(0.63, downBy + 0.05, 0.6);
+	txtTotal.position.set(0.83, downBy + 0.05, 0.6);
 	noteConfCustomGame.add(txtTotal);
 
-	noteConfCustomGame.position.set(0.5, 1.85, 0.6);
+	noteConfCustomGame.position.set(0.5, 1.9, 0.6);
 	PIEaddElement(noteConfCustomGame);
 	PIErender();
 }
@@ -993,6 +993,8 @@ function removeBoxesGame2(){
 	for( let i = 0; i < textIndexMapGame2.length; ++i){
 		PIEremoveElement(buttonsGame2[i]);
 		PIEremoveElement(buttonsGame2[i + 8]);
+		td = textIndexMapGame2[i];
+		tenders[td]['img'].material.opacity = 1.0;
 	}
 	PIEremoveElement(seperator);
 	PIEremoveElement(totalBox);
@@ -1000,9 +1002,9 @@ function removeBoxesGame2(){
 	for(let i = 0; i < eachValueGame2.length; ++i){
 		eachValueGame2[i] = 0;
 	}
-	for(let i = 0; i < indiCountGame2.length; ++i){
-		PIEremoveElement(indiCountGame2[i]);
-	}
+	// for(let i = 0; i < indiCountGame2.length; ++i){
+	// 	PIEremoveElement(indiCountGame2[i]);
+	// }
 	for(let td of tenderVarsGame2){
 		PIEremoveElement(td);
 	}
@@ -1034,7 +1036,7 @@ function updateTotal(addOrSub, index){
 	// if(totalBox == null) return;
 	let amount = valueIndexMapGame2[index];
 	PIEremoveElement(totalBox);
-	PIEremoveElement(indiCountGame2[index]);
+	// PIEremoveElement(indiCountGame2[index]);
 	PIEremoveElement(tenderVarsGame2[index]);
 	totalSum = totalSum + addOrSub * amount;
 	let dispSum = totalSum;
@@ -1043,12 +1045,12 @@ function updateTotal(addOrSub, index){
 	}
 	totalBox = drawText("Total = Rs. " + dispSum, 0xffffff, 0.15, 0.001, fontGeneral, 0, true);
 
-	let amountIndi = drawText(eachValueGame2[index], 0xffffff, 0.20, 0.001, fontGeneral, 0.0, true);
+	// let amountIndi = drawText(eachValueGame2[index], 0xffffff, 0.20, 0.001, fontGeneral, 0.0, true);
 
-	amountIndi.position.set(positionsGame2[index].x, positionsGame2[index].y, positionsGame2[index].z);
-	indiCountGame2[index] = amountIndi;
+	// amountIndi.position.set(positionsGame2[index].x, positionsGame2[index].y, positionsGame2[index].z);
+	// indiCountGame2[index] = amountIndi;
 	if(eachValueGame2[index] != 0){
-		tenderVarsGame2[index] = showMultiple(tenders[textIndexMapGame2[index]]['img'], eachValueGame2[index], 1.0, 0.05, [0.1, -0.01, 0.01]);
+		tenderVarsGame2[index] = showMultiple(tenders[textIndexMapGame2[index]]['img'], eachValueGame2[index], 1.0, 0.01, [0.18, -0.01, 0.01]);
 	} else {
 		tenderVarsGame2[index] = tenders[textIndexMapGame2[index]]['img'].clone();
 	}
@@ -1059,17 +1061,17 @@ function updateTotal(addOrSub, index){
 	}
 	tenderVarsGame2[index].position.set(tenderPositionsGame2[index].x, tenderPositionsGame2[index].y, tenderPositionsGame2[index].z);
 	if(eachValueGame2[index] > 0){
-		indiCountGame2[index].material.opacity = 1.0;
+		// indiCountGame2[index].material.opacity = 1.0;
 		tenders[textIndexMapGame2[index]]['img'].material.opacity = 1.0;
 
 	} else {
 		tenders[textIndexMapGame2[index]]['img'].material.opacity = 0.3;
-		indiCountGame2[index].material.opacity = 0.5;
+		// indiCountGame2[index].material.opacity = 0.5;
 	}
 
-	PIEaddElement(indiCountGame2[index]);
+	// PIEaddElement(indiCountGame2[index]);
 	PIEaddElement(tenderVarsGame2[index]);
-	totalBox.position.set(positionsGame2[8].x, positionsGame2[8].y, positionsGame2[8].z);
+	totalBox.position.set(positionsGame2.x, positionsGame2.y, positionsGame2.z);
 	PIEaddElement(totalBox);
 }
 
@@ -1090,8 +1092,8 @@ function addGame2(){
 	}
 
 	let downBy = 0;
-	indiCountGame2 = [];
-	positionsGame2 = [];
+	// indiCountGame2 = [];
+	positionsGame2 = undefined;
 	tenderVarsGame2 = [];
 	tenderPositionsGame2 = [];
 	let tendersToShow = ['tender100', 'tender50', 'tender20', 'tender10', 'tender5', 'coin2', 'coin1', 'coin50p'];
@@ -1108,15 +1110,15 @@ function addGame2(){
 			} else {
 				tenderClone.scale.set(0.6, 0.6, 1);	
 			}
-			buttonsGame2[counter].position.set(2.0, 1.7 - downBy - 0.3, 1);
-			buttonsGame2[8 + counter].position.set(2.5, 1.7 - downBy - 0.3, 1);
-			let amount = drawText(eachValueGame2[counter], 0xffffff, 0.2, 0.001, fontGeneral, 0.0, true);
-			let ps = new THREE.Vector3(2.2, 1.7 - downBy - 0.4, 1);
-			positionsGame2.push(ps);
-			amount.material.opacity = 0.5;
-			amount.position.set(2.2, 1.7 - downBy - 0.40, 1);
-			PIEaddElement(amount);
-			indiCountGame2.push(amount);
+			buttonsGame2[counter].position.set(2.5, 1.7 - downBy - 0.2, 1);
+			buttonsGame2[8 + counter].position.set(2.5, 1.7 - downBy - 0.4, 1);
+			// // let amount = drawText(eachValueGame2[counter], 0xffffff, 0.2, 0.001, fontGeneral, 0.0, true);
+			// let ps = new THREE.Vector3(2.2, 1.7 - downBy - 0.4, 1);
+			// positionsGame2.push(ps);
+			// amount.material.opacity = 0.5;
+			// amount.position.set(2.2, 1.7 - downBy - 0.40, 1);
+			// PIEaddElement(amount);
+			// indiCountGame2.push(amount);
 			downBy += 0.8;
 		} else{
 			let tenderClone = (tenders[td]['img']).clone();
@@ -1125,15 +1127,15 @@ function addGame2(){
 			tenderClone.position.set(-2, 1.7 - downBy - 0.3, 1);
 			tenderClone.material.opacity = 0.3;
 			tenderClone.scale.set(0.65, 0.65, 1);
-			buttonsGame2[counter].position.set(-1.0, 1.7 - downBy - 0.3, 1);
-			buttonsGame2[8 + counter].position.set(-0.5, 1.7 - downBy - 0.3, 1);
-			let amount = drawText(eachValueGame2[counter], 0xffffff, 0.2, 0.001, fontGeneral, 0.0, true);
-			amount.material.opacity = 0.5;
-			let ps = new THREE.Vector3(-.82, 1.7 - downBy - 0.4, 1);
-			positionsGame2.push(ps);			
-			amount.position.set(-.82, 1.7 - downBy - 0.40, 1);
-			PIEaddElement(amount);
-			indiCountGame2.push(amount);
+			buttonsGame2[counter].position.set(-0.5, 1.7 - downBy - 0.2, 1);
+			buttonsGame2[8 + counter].position.set(-0.5, 1.7 - downBy - 0.4, 1);
+			// let amount = drawText(eachValueGame2[counter], 0xffffff, 0.2, 0.001, fontGeneral, 0.0, true);
+			// amount.material.opacity = 0.5;
+			// let ps = new THREE.Vector3(-.82, 1.7 - downBy - 0.4, 1);
+			// positionsGame2.push(ps);			
+			// amount.position.set(-.82, 1.7 - downBy - 0.40, 1);
+			// PIEaddElement(amount);
+			// indiCountGame2.push(amount);
 			downBy += 0.8;
 		}
 		PIEaddElement(tenderVarsGame2[counter]);
@@ -1163,7 +1165,7 @@ function addGame2(){
 	
 
 	let ps = new THREE.Vector3(-0.3, 1.7 - downBy + 0.1, 1);
-	positionsGame2.push(ps);
+	positionsGame2 = ps;
 	totalBox.position.set(-0.3, 1.7 - downBy + 0.1, 1)	
 	PIEaddElement(totalBox);
 	PIEaddElement(seperator);
