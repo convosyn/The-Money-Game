@@ -1198,7 +1198,9 @@ function removeBoxesGame3(){
 	PIEremoveElement(doneButton);
 	removeInvoice();
 	PIEremoveElement(clickOnItemText);
+	// board.rotation.x = -3;
 	hasBoxesGame3 = false;
+	PIErender();
 }
 
 var shopItems;
@@ -1223,6 +1225,7 @@ var itembbsGame3;
 var disableInvoice;
 
 function initControlsGame3(){
+	board.rotation.set(deg2Rad(-3), deg2Rad(180), deg2Rad(0));
 	bendBoardBool = true;
 	shop = undefined;
 	shopItems = undefined;
@@ -1232,6 +1235,7 @@ function initControlsGame3(){
 	currentRotationBoard = board.rotation.x;
 	yourItemsGame3Obj = undefined;
 	yourItemsGame3Count = [0, 0, 0, 0, 0];
+	PIErender();
 }
 
 function isGenerateInvoice(){
@@ -1542,11 +1546,13 @@ function addGame3(){
 
 function bendBoard(inverse = false){
 	let rt = -50;
-	if(inverse == false && board.rotation.x > deg2Rad(rt)){
+	console.log("bendBoardCalled");
+	if(inverse == false && board.rotation.x >= deg2Rad(rt)){
 		board.rotation.x -= deg2Rad(1);
-		if(board.rotation.x < deg2Rad(rt)){
+		if(board.rotation.x <= deg2Rad(rt)){
 			board.rotation.x = deg2Rad(rt)
 			bendBoardBool = false;
+			console.log("drawShopCalled");
 			drawShop();
 		}
 	} else if(inverse == true && board.rotation.x < deg2Rad(-3)){
@@ -1904,10 +1910,15 @@ function updateExperimentElements(t, dt){
 			rotateBoard();
 		}
 	}
-	if(currentGame == 3 && bendBoardBool == true){
-		bendBoard();
-	} else if(currentGame != 3 && bendBoardBool == true){
-		bendBoard(true);
+	if(bendBoardBool == true){
+		// console.log("bendBoard looking");
+		if(currentGame == 3){
+			// console.log("Bend board calling....");
+			bendBoard();
+		}
+		else if(currentGame != 3){
+			bendBoard(true);
+		}
 	}
 }
 
