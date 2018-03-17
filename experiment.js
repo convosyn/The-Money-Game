@@ -532,11 +532,11 @@ function getTextGame1(value){
 		value = value.toFixed(2);
 	}
 	let ttl = drawText("Rs. " + padWithSpace(" ", value, 3), 0x121212, 0.15, 0.001, fontGeneral, 0.0, true);
-	ttl.position.x = 0.56;
+	ttl.position.x = 0.44;
 	ttl.position.y = 1.3 - downBy - 0.15;
 	ttl.position.z = 1;
 	let ttlString = drawText("Total  = ", 0x121212, 0.15, 0.001, fontGeneral, 0.0, true);
-	ttlString.position.x = -0.06;
+	ttlString.position.x = -0.22;
 	ttlString.position.y = 1.3 - downBy - 0.15;
 	ttlString.position.z = 1;
 	group.add(bx);
@@ -818,7 +818,7 @@ function handleShowClickCustomGame(){
 			imagePart.position.set(0.0, downBy, 0.6);
 			let temp = countForThis * tndr['val'];
 			let times = drawText("= Rs." + padWithSpace(" ", temp, 3), 0xcdcdcd, 0.14, 0.001, fontGeneral, 0.0, true);
-			times.position.set(1.8, downBy - 0.05, 0.6);
+			times.position.set(2.0, downBy - 0.05, 0.6);
 			let grp = new THREE.Group();
 			grp.add(imagePart);
 			grp.add(times);
@@ -838,7 +838,7 @@ function handleShowClickCustomGame(){
 			imagePart.position.set(0.0, downBy, 0.6);
 			let temp = countForThis * tndr['val'];
 			let times = drawText("= Rs." + padWithSpace(" ", temp, 3), 0xcdcdcd, 0.14, 0.001, fontGeneral, 0.0, true);
-			times.position.set(1.8, downBy - 0.05, 0.6);
+			times.position.set(2.0, downBy - 0.05, 0.6);
 			let grp = new THREE.Group();
 			grp.add(imagePart);
 			grp.add(times);
@@ -854,7 +854,7 @@ function handleShowClickCustomGame(){
 			imagePart.scale.y = 0.47;
 			imagePart.position.set(0.0, downBy, 0.6);
 			let times = drawText("= Rs." + padWithSpace(" ", "0.50", 3), 0xcdcdcd, 0.14, 0.001, fontGeneral, 0.0, true);
-			times.position.set(1.8, downBy - 0.05, 0.6);
+			times.position.set(2.0, downBy - 0.05, 0.6);
 			let grp = new THREE.Group();
 			grp.add(imagePart);
 			grp.add(times);
@@ -874,7 +874,7 @@ function handleShowClickCustomGame(){
 		value = value.toFixed(2);
 	} 
 	var txtTotal = drawText("Total = Rs." + padWithSpace(" ", value, 3), 0xcdcdcd, 0.14, 0.001, fontGeneral, 0.0, true);
-	txtTotal.position.set(1.33, downBy + 0.05, 0.6);
+	txtTotal.position.set(1.53, downBy + 0.05, 0.6);
 	noteConfCustomGame.add(txtTotal);
 
 	noteConfCustomGame.position.set(0.0, 1.9, 0.6);
