@@ -24,6 +24,8 @@ var hbNow;
 var prevGame;
 var displayGame1Hovers;
 var showingCustomGame;
+var clickToStartGame3OnReset;
+var showingGame3ForResetBool;
 
 // helper functions
 function deg2Rad(value){
@@ -169,6 +171,7 @@ function rotateBoard(){
 		boardCurrentSpeed = 0;
 		initControls();
 		document.addEventListener('mousedown', onDocumentMouseDown, false);
+		window.addEventListener('resize', onScreenResize, false);
 		loadGameScene();
 	}
 	PIErender();
@@ -198,20 +201,28 @@ function alignCenter(elem1, elem2){
 	return [elem1Clone, elem2Clone];
 }
 
-function showMultiple(obj, count, currentScale = 1.0, reductionFactor = 0.05, incrementFactor = [0.05, -0.05, 0.01]){
+function showMultiple(obj, count, currentScale = 1.0, reductionFactor = 0.05, incrementFactor = [0.05, -0.05, 0.01], customText = null){
 	var cloneObj = obj.clone();
 	cloneObj.scale.x = currentScale - count * reductionFactor;
 	cloneObj.scale.y = currentScale - count * reductionFactor;
 	var group = new THREE.Group();
 	var currentPosition = [0.0, 0.0, 0.0];
+	let objMult;
 	for(let i = 0; i < count; ++i){
-		let objMult = cloneObj.clone();
+		objMult = cloneObj.clone();
 		objMult.position.set(currentPosition[0], currentPosition[1], currentPosition[2]);
 		group.add(objMult);
 		currentPosition[0] = currentPosition[0] + incrementFactor[0];
 		currentPosition[1] = currentPosition[1] + incrementFactor[1];
 		currentPosition[2] = currentPosition[2] + incrementFactor[2];
 		console.log(currentPosition);
+	}
+	if(customText){
+		console.log("running show custom text");
+		let customTextDisp = drawText(customText, 0x000000, 0.4 + count * reductionFactor, 0.001, fontGeneral, 0.0, true);
+		let elem = alignCenter(customTextDisp, objMult);
+		group.add(elem[0]);
+		elem[0].position.z = currentPosition[2] + 0.01;
 	}
 	return group;
 }
@@ -235,7 +246,7 @@ function initialiseVariables(){
 	game3CheckBox = "Activity 3";
 	boxes = undefined;
 	displayGame1Hovers = false;
-	showingCustomGame = false; 
+	showingCustomGame = false;
 }
 
 function addFonts(pathToFont){
@@ -776,7 +787,7 @@ function handleInputCustomGame1(key){
 			value = parseFloat(tempString);
 			let valueInt = parseInt(value);
 			if(value - valueInt != 0){
-				if(value - valueInt != .5) return;
+				if(value - valueInt < 0.01 && value - valueInt > .99) return;
 				let parts = tempString.split(".");
 				if(parts[1].length > 2) return;
 			} 
@@ -805,6 +816,12 @@ function handleShowClickCustomGame(){
 	if(textInputCustomGame === "") return;
 	var value = parseFloat(textInputCustomGame);
 	var intPart = parseInt(value);
+	var diffValIntPart = value - intPart;
+	if(diffValIntPart != 0){
+		if(diffValIntPart <= 0.25) value = intPart;
+		else if(diffValIntPart > 0.25 && diffValIntPart <= .75) value = (intPart + 0.50);
+		else if(diffValIntPart > 0.75) value = intPart + 1;
+	}
 	var leftOver = value;
 	var downBy = 0;
 	for(let i = 0; i < toCheckInOrder.length - 2; ++i){
@@ -847,7 +864,7 @@ function handleShowClickCustomGame(){
 		}
 	}
 
-	if(value - intPart != 0){
+	if(value - parseInt(value) != 0){
 		let tndr = tenders['coin50p'];
 		let imagePart = tndr['img'].clone();
 			imagePart.scale.x = 0.47;
@@ -1053,6 +1070,32 @@ function handleClickGame2(intersectedBox){
 	}
 }
 
+function redrawGame2OnSpot(){
+	for(let index = 0; index < tenderVarsGame2.length; ++index){
+		PIEremoveElement(tenderVarsGame2[index]);
+		if(eachValueGame2[index] != 0){
+			if(window.innerWidth < 850){
+				tenderVarsGame2[index] = showMultiple(tenders[textIndexMapGame2[index]]['img'], eachValueGame2[index], 1.0, 0.01, [0.3, -0.06, 0.01], tenders[textIndexMapGame2[index]]['val']);
+			} else {
+				tenderVarsGame2[index] = showMultiple(tenders[textIndexMapGame2[index]]['img'], eachValueGame2[index], 1.0, 0.01, [0.3, -0.06, 0.01]);
+			}
+		} else {
+			if(window.innerWidth < 850){
+				tenderVarsGame2[index] = showMultiple(tenders[textIndexMapGame2[index]]['img'], 1, 1.0, 0.01, [0.3, -0.06, 0.01], tenders[textIndexMapGame2[index]]['val']);
+			} else {
+				tenderVarsGame2[index] = showMultiple(tenders[textIndexMapGame2[index]]['img'], 1, 1.0, 0.01, [0.3, -0.06, 0.01]);
+			}
+		}
+		if(textIndexMapGame2[index].startsWith('tender')){
+			tenderVarsGame2[index].scale.set(0.65, 0.65, 1.0);
+		} else {
+			tenderVarsGame2[index].scale.set(0.6, 0.6, 0.1);
+		}
+		tenderVarsGame2[index].position.set(tenderPositionsGame2[index].x, tenderPositionsGame2[index].y, tenderPositionsGame2[index].z);
+		PIEaddElement(tenderVarsGame2[index]);
+	}
+}
+
 function updateTotal(addOrSub, index){
 	// if(totalBox == null) return;
 	let amount = valueIndexMapGame2[index];
@@ -1071,9 +1114,17 @@ function updateTotal(addOrSub, index){
 	// amountIndi.position.set(positionsGame2[index].x, positionsGame2[index].y, positionsGame2[index].z);
 	// indiCountGame2[index] = amountIndi;
 	if(eachValueGame2[index] != 0){
-		tenderVarsGame2[index] = showMultiple(tenders[textIndexMapGame2[index]]['img'], eachValueGame2[index], 1.0, 0.01, [0.3, -0.06, 0.01]);
+		if(window.innerWidth < 850){
+			tenderVarsGame2[index] = showMultiple(tenders[textIndexMapGame2[index]]['img'], eachValueGame2[index], 1.0, 0.01, [0.3, -0.06, 0.01], tenders[textIndexMapGame2[index]]['val']);
+		} else {
+			tenderVarsGame2[index] = showMultiple(tenders[textIndexMapGame2[index]]['img'], eachValueGame2[index], 1.0, 0.01, [0.3, -0.06, 0.01]);
+		}
 	} else {
-		tenderVarsGame2[index] = tenders[textIndexMapGame2[index]]['img'].clone();
+		if(window.innerWidth < 850){
+			tenderVarsGame2[index] = showMultiple(tenders[textIndexMapGame2[index]]['img'], 1, 1.0, 0.01, [0.3, -0.06, 0.01], tenders[textIndexMapGame2[index]]['val']);
+		} else {
+			tenderVarsGame2[index] = showMultiple(tenders[textIndexMapGame2[index]]['img'], 1, 1.0, 0.01, [0.3, -0.06, 0.01]);
+		}
 	}
 	if(textIndexMapGame2[index].startsWith('tender')){
 		tenderVarsGame2[index].scale.set(0.65, 0.65, 1.0);
@@ -1121,11 +1172,16 @@ function addGame2(){
 	for(let counter = 0; counter < tendersToShow.length; ++counter){
 		let td = tendersToShow[counter];
 		if(counter >= 4){
-			let tenderClone = (tenders[td]['img']).clone();
+			let tenderClone;
+			if(window.innerWidth <= 850){
+				tenderClone = showMultiple(tenders[td]['img'], 1, 1.0, 0.01, [0.3, -0.06, 0.01], tenders[textIndexMapGame2[index]]['val']);
+			} else {
+				tenderClone = showMultiple(tenders[td]['img'], 1, 1.0, 0.01, [0.3, -0.06, 0.01]);
+			}
 			tenderVarsGame2.push(tenderClone);
 			tenderPositionsGame2.push(new THREE.Vector3(0.9, 1.7 - downBy - 0.3, 1));
 			tenderClone.position.set(0.9, 1.7 - downBy - 0.3, 1);
-			tenderClone.material.opacity = 0.3;
+			tenders[td]['img'].material.opacity = 0.3;
 			if(td.startsWith("tender") == false){
 				tenderClone.scale.set(0.65, 0.65, 1);	
 			} else {
@@ -1142,11 +1198,16 @@ function addGame2(){
 			// indiCountGame2.push(amount);
 			downBy += 0.85;
 		} else{
-			let tenderClone = (tenders[td]['img']).clone();
+			let tenderClone;
+			if(window.innerWidth <= 850){
+				tenderClone = showMultiple(tenders[td]['img'], 1, 1.0, 0.01, [0.3, -0.06, 0.01], tenders[textIndexMapGame2[index]]['val']);
+			} else {
+				tenderClone = showMultiple(tenders[td]['img'], 1, 1.0, 0.01, [0.3, -0.06, 0.01]);
+			}
 			tenderVarsGame2.push(tenderClone);
 			tenderPositionsGame2.push(new THREE.Vector3(-2.2, 1.7 - downBy - 0.3, 1));
 			tenderClone.position.set(-2.2, 1.7 - downBy - 0.3, 1);
-			tenderClone.material.opacity = 0.3;
+			tenders[td]['img'].material.opacity = 0.3;
 			tenderClone.scale.set(0.65, 0.65, 1);
 			buttonsGame2[counter].position.set(-0.3, 1.7 - downBy - 0.2, 1);
 			buttonsGame2[8 + counter].position.set(-0.3, 1.7 - downBy - 0.4, 1);
@@ -1796,7 +1857,7 @@ function loadExperimentElements(){
 	PIEscene.background = new THREE.Color(0xababab);
 	bulb = new THREE.PointLight(0xfff);
 	bulb.position.set(0, boardHeight * 0.3, 0.0);
-
+	
 	PIEaddElement(bulb);
 	initialiseVariables();
 	PIEsetAreaOfInterest(-3, 3, 3, -3);
@@ -1811,6 +1872,7 @@ function runFirstTime(){
 	document.removeEventListener('mousedown', onDocumentMouseDown, false);
 	PIErender();
 	prevGame = currentGame = 1;	
+	prevSizeScreenWidth = currentSizeScreenWidth = window.innerWidth;
 	notifyChangeGame(false);
 	initializeOtherVariables();
 	runBootStrap();
@@ -1829,8 +1891,16 @@ function resetExperiment(){
 	// runBootStrap();
 	beforeChangeGame();
 	notifyChangeGame();
-}
+	if(currentGame == 3){
+		if(!clickToStartGame3OnReset){
+			clickToStartGame3OnReset = drawText('Click on Start Button', 0x888888, 0.3, 0.001, fontGeneral, 0.0, true);
+			clickToStartGame3OnReset.position.set(-2.0, 0, 1.0);
+		}	
+		PIEaddElement(clickToStartGame3OnReset);
+		showingGame3ForResetBool = true;
 
+	}
+}
 var raycaster= new THREE.Raycaster();
 var mouse = new THREE.Vector2();
 function onDocumentMouseHover( event ) {
@@ -1956,6 +2026,19 @@ function onDocumentMouseDown( event ) {
 	PIErender();
 }
 
+function onScreenResize(){
+	console.log("previous screen width" + currentSizeScreenWidth);
+	if((currentSizeScreenWidth <= 850 && window.innerWidth > 850) || (currentSizeScreenWidth > 850 && window.innerWidth <= 850)){
+		console.log("entered width flip");
+		if(currentGame == 2) {
+			console.log('redrawing scene game 2');
+			redrawGame2OnSpot();
+		}
+	}
+	// prevSizeScreenWidth = currentSizeScreenWidth;
+	currentSizeScreenWidth = window.innerWidth;
+	console.log(window.innerWidth + " <> " + window.innerHeight);
+}
 
 function updateExperimentElements(t, dt){
     if(board != undefined){
@@ -1972,6 +2055,10 @@ function updateExperimentElements(t, dt){
 		else if(currentGame != 3){
 			bendBoard(true);
 		}
+	}
+	if(currentGame == 3 && showingGame3ForResetBool == true){
+		PIEremoveElement(clickToStartGame3OnReset);
+		showingGame3ForResetBool = false;
 	}
 }
 
