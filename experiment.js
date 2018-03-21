@@ -752,6 +752,7 @@ var showConfigurationButton;
 var seperatorCustomGame;
 var infoBoxCustomGame;
 var writeHereDisplayCustomGame;
+var handleClickedCustomGameBool;
 
 function handleInputCustomGame1(key){
 	let tempString = textInputCustomGame.slice(0, textInputCustomGame.length);
@@ -878,9 +879,9 @@ function handleShowClickCustomGame(){
 		let tndr = tenders['coin50p'];
 		let imagePart;
 		if(window.innerWidth > 640){
-			imagePart = showMultiple(tndr['img'].clone(), countForThis, 1.0, 0.01, [0.45, -0.015, 0.01]); //, 1.0, 0.05, [0.1, -0.01, 0.1]);
+			imagePart = showMultiple(tndr['img'].clone(), 1, 1.0, 0.01, [0.45, -0.015, 0.01]); //, 1.0, 0.05, [0.1, -0.01, 0.1]);
 		} else {
-			imagePart = showMultiple(tndr['img'].clone(), countForThis, 1.0, 0.01, [0.45, -0.015, 0.01], tndr['val']);
+			imagePart = showMultiple(tndr['img'].clone(), 1, 1.0, 0.01, [0.45, -0.015, 0.01], tndr['val']);
 		}
 		imagePart.scale.x = 0.47;
 		imagePart.scale.y = 0.47;
@@ -904,7 +905,7 @@ function handleShowClickCustomGame(){
 
 	var toShowValue = intPart;
 	if(value - parseInt(value) != 0){
-		if(value - intPart > 0.50){
+		if(value - intPart >= 0.50){
 			toShowValue = (intPart + 0.50).toFixed(2);
 		} else {
 			toShowValue = (intPart)
@@ -927,6 +928,7 @@ function handleShowClickCustomGame(){
 
 	noteConfCustomGame.position.set(0.0, 1.9, 0.6);
 	PIEaddElement(noteConfCustomGame);
+	handleClickedCustomGameBool = true;
 	PIErender();
 }
 
@@ -945,6 +947,7 @@ function removeCustomGame1(){
 	showingCustomGame = false;
 	isDecimalEntered = false;
 	document.removeEventListener('keydown', onDocumentKeyPress, false);
+	handleClickedCustomGameBool = false;
 	PIErender();
 }
 
@@ -955,6 +958,7 @@ function customNoteScene(){
 	console.log("added custom note");
 	removeBoxesGame1();
 	noteConfCustomGame = null;
+	handleClickedCustomGameBool = false;
 	let backButtonText = drawText("< BACK", 0x222222, 0.1, 0.001, fontCurrency, 0.0, true);
 	let backButtonCoverGeometry = new THREE.PlaneGeometry(0.7, 0.3);
 	let backButtonMaterial = new THREE.MeshBasicMaterial({color: 0xdddddd , transparent: true});
@@ -1108,17 +1112,17 @@ function handleClickGame2(intersectedBox){
 function redrawGame2OnSpot(){
 	for(let index = 0; index < tenderVarsGame2.length; ++index){
 		PIEremoveElement(tenderVarsGame2[index]);
-		if(eachValueGame2[index] != 0){
-			if(window.innerWidth < 640){
-				tenderVarsGame2[index] = showMultiple(tenders[textIndexMapGame2[index]]['img'], eachValueGame2[index], 1.0, 0.01, [0.3, -0.06, 0.01], tenders[textIndexMapGame2[index]]['val']);
-			} else {
-				tenderVarsGame2[index] = showMultiple(tenders[textIndexMapGame2[index]]['img'], eachValueGame2[index], 1.0, 0.01, [0.3, -0.06, 0.01]);
-			}
-		} else {
-			if(window.innerWidth < 640){
+		if(eachValueGame2[index] == 0){
+			if(currentSizeScreenWidth < 640){
 				tenderVarsGame2[index] = showMultiple(tenders[textIndexMapGame2[index]]['img'], 1, 1.0, 0.01, [0.3, -0.06, 0.01], tenders[textIndexMapGame2[index]]['val']);
 			} else {
 				tenderVarsGame2[index] = showMultiple(tenders[textIndexMapGame2[index]]['img'], 1, 1.0, 0.01, [0.3, -0.06, 0.01]);
+			}
+		} else {
+			if(currentSizeScreenWidth < 640){
+				tenderVarsGame2[index] = showMultiple(tenders[textIndexMapGame2[index]]['img'], eachValueGame2[index], 1.0, 0.01, [0.3, -0.06, 0.01], tenders[textIndexMapGame2[index]]['val']);
+			} else {
+				tenderVarsGame2[index] = showMultiple(tenders[textIndexMapGame2[index]]['img'], eachValueGame2[index], 1.0, 0.01, [0.3, -0.06, 0.01]);
 			}
 		}
 		if(textIndexMapGame2[index].startsWith('tender')){
@@ -2071,15 +2075,20 @@ function onDocumentMouseDown( event ) {
 
 function onScreenResize(){
 	console.log("previous screen width" + currentSizeScreenWidth);
-	if((currentSizeScreenWidth <= 850 && window.innerWidth > 850) || (currentSizeScreenWidth > 850 && window.innerWidth <= 850)){
+	if((currentSizeScreenWidth <= 640 && window.innerWidth > 640) || (currentSizeScreenWidth > 640 && window.innerWidth <= 640)){
 		console.log("entered width flip");
-		if(currentGame == 2) {
+		currentSizeScreenWidth = window.innerWidth;
+		if(currentGame == 1){
+			if(showingCustomGame == true && handleClickedCustomGameBool == true){
+				handleShowClickCustomGame();
+			}
+		}
+		else if(currentGame == 2) {
 			console.log('redrawing scene game 2');
 			redrawGame2OnSpot();
 		}
 	}
 	// prevSizeScreenWidth = currentSizeScreenWidth;
-	currentSizeScreenWidth = window.innerWidth;
 	console.log(window.innerWidth + " <> " + window.innerHeight);
 }
 
