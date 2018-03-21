@@ -777,8 +777,8 @@ function handleInputCustomGame1(key){
 	if(tempString === ""){
 		textInputCustomGame = "";
 		PIEremoveElement(textDisplayCustomGame);
-		textDisplayCustomGame =  drawText(textInputCustomGame + "_", 0x222222, 0.18, 0.001, fontGeneral, 0.0, true);
-		textDisplayCustomGame.position.set(-2.8, 0.9, 0.6);
+		textDisplayCustomGame =  drawText(textInputCustomGame + "_", 0x222222, 0.13, 0.001, fontGeneral, 0.0, true);
+		textDisplayCustomGame.position.set(-2.9, 0.9, 0.6);
 		PIEaddElement(textDisplayCustomGame);
 	}else {
 		let value;
@@ -796,8 +796,8 @@ function handleInputCustomGame1(key){
 		if(value <= 1000){
 			textInputCustomGame = tempString.slice(0, tempString.length);
 			PIEremoveElement(textDisplayCustomGame);
-			textDisplayCustomGame =  drawText(textInputCustomGame + "_", 0x222222, 0.18, 0.001, fontGeneral, 0.0, true);
-			textDisplayCustomGame.position.set(-2.8, 0.9, 0.6);
+			textDisplayCustomGame =  drawText(textInputCustomGame + "_", 0x222222, 0.13, 0.001, fontGeneral, 0.0, true);
+			textDisplayCustomGame.position.set(-2.9, 0.9, 0.6);
 			PIEaddElement(textDisplayCustomGame);
 		}
 	}
@@ -817,11 +817,11 @@ function handleShowClickCustomGame(){
 	var value = parseFloat(textInputCustomGame);
 	var intPart = parseInt(value);
 	var diffValIntPart = value - intPart;
-	if(diffValIntPart != 0){
-		if(diffValIntPart <= 0.25) value = intPart;
-		else if(diffValIntPart > 0.25 && diffValIntPart <= .75) value = (intPart + 0.50);
-		else if(diffValIntPart > 0.75) value = intPart + 1;
-	}
+	// if(diffValIntPart != 0){
+	// 	if(diffValIntPart <= 0.25) value = intPart;
+	// 	else if(diffValIntPart > 0.25 && diffValIntPart <= .75) value = (intPart + 0.50);
+	// 	else if(diffValIntPart > 0.75) value = intPart + 1;
+	// }
 	var leftOver = value;
 	var downBy = 0;
 	for(let i = 0; i < toCheckInOrder.length - 2; ++i){
@@ -829,10 +829,15 @@ function handleShowClickCustomGame(){
 		let countForThis = parseInt(leftOver / tndr['val']);
 		leftOver = leftOver % tndr['val'];
 		if(countForThis > 0){
-			let imagePart = showMultiple(tndr['img'].clone(), countForThis, 1.0, 0.01, [0.35, -0.016, 0.01]); //, 1.0, 0.05, [0.1, -0.01, 0.1]);
+			let imagePart;
+			if(window.innerWidth > 640){
+				imagePart = showMultiple(tndr['img'].clone(), countForThis, 1.0, 0.01, [0.45, -0.015, 0.01]); //, 1.0, 0.05, [0.1, -0.01, 0.1]);
+			} else {
+				imagePart = showMultiple(tndr['img'].clone(), countForThis, 1.0, 0.01, [0.45, -0.015, 0.01], tndr['val']);
+			}
 			imagePart.scale.x = 0.47;
 			imagePart.scale.y = 0.47;
-			imagePart.position.set(0.0, downBy, 0.6);
+			imagePart.position.set(-0.4, downBy, 0.6);
 			let temp = countForThis * tndr['val'];
 			let times = drawText("= Rs." + padWithSpace(" ", temp, 3), 0xcdcdcd, 0.14, 0.001, fontGeneral, 0.0, true);
 			times.position.set(2.0, downBy - 0.05, 0.6);
@@ -849,10 +854,15 @@ function handleShowClickCustomGame(){
 		let countForThis = parseInt(leftOver / tndr['val']);
 		leftOver = leftOver % tndr['val'];
 		if(countForThis > 0){
-			let imagePart = showMultiple(tndr['img'].clone(), countForThis, 1.0, 0.01, [0.35, -0.015, 0.01]); //, 1.0, 0.05, [0.1, -0.01, 0.1]);
+			let imagePart;
+			if(window.innerWidth > 640){
+				imagePart = showMultiple(tndr['img'].clone(), countForThis, 1.0, 0.01, [0.45, -0.015, 0.01]); //, 1.0, 0.05, [0.1, -0.01, 0.1]);
+			} else {
+				imagePart = showMultiple(tndr['img'].clone(), countForThis, 1.0, 0.01, [0.45, -0.015, 0.01], tndr['val']);
+			}
 			imagePart.scale.x = 0.47;
 			imagePart.scale.y = 0.47;
-			imagePart.position.set(0.0, downBy, 0.6);
+			imagePart.position.set(-0.4, downBy, 0.6);
 			let temp = countForThis * tndr['val'];
 			let times = drawText("= Rs." + padWithSpace(" ", temp, 3), 0xcdcdcd, 0.14, 0.001, fontGeneral, 0.0, true);
 			times.position.set(2.0, downBy - 0.05, 0.6);
@@ -864,34 +874,55 @@ function handleShowClickCustomGame(){
 		}
 	}
 
-	if(value - parseInt(value) != 0){
+	if(value - parseInt(value) == 0.50){
 		let tndr = tenders['coin50p'];
-		let imagePart = tndr['img'].clone();
-			imagePart.scale.x = 0.47;
-			imagePart.scale.y = 0.47;
-			imagePart.position.set(0.0, downBy, 0.6);
-			let times = drawText("= Rs." + padWithSpace(" ", "0.50", 3), 0xcdcdcd, 0.14, 0.001, fontGeneral, 0.0, true);
-			times.position.set(2.0, downBy - 0.05, 0.6);
-			let grp = new THREE.Group();
-			grp.add(imagePart);
-			grp.add(times);
-			noteConfCustomGame.add(grp);
-			downBy -= 0.45;
+		let imagePart;
+		if(window.innerWidth > 640){
+			imagePart = showMultiple(tndr['img'].clone(), countForThis, 1.0, 0.01, [0.45, -0.015, 0.01]); //, 1.0, 0.05, [0.1, -0.01, 0.1]);
+		} else {
+			imagePart = showMultiple(tndr['img'].clone(), countForThis, 1.0, 0.01, [0.45, -0.015, 0.01], tndr['val']);
+		}
+		imagePart.scale.x = 0.47;
+		imagePart.scale.y = 0.47;
+		imagePart.position.set(-0.4, downBy, 0.6);
+		let times = drawText("= Rs." + padWithSpace(" ", "0.50", 3), 0xcdcdcd, 0.14, 0.001, fontGeneral, 0.0, true);
+		times.position.set(2.0, downBy - 0.05, 0.6);
+		let grp = new THREE.Group();
+		grp.add(imagePart);
+		grp.add(times);
+		noteConfCustomGame.add(grp);
+		downBy -= 0.45;
 	}
 	downBy += 0.14;
-	var seperatorGeometry = new THREE.PlaneGeometry(3, 0.02);
+	var seperatorGeometry = new THREE.PlaneGeometry(4, 0.02);
 	var seperatorMaterial = new THREE.MeshBasicMaterial({color: 0xffffff, transparent: true});
 	seperatorMaterial.opacity = 0.8;
 	var seperatorTotal = new THREE.Mesh(seperatorGeometry, seperatorMaterial);
-	seperatorTotal.position.set(1.2, downBy, 0.6);
+	seperatorTotal.position.set(1.0, downBy, 0.6);
 	noteConfCustomGame.add(seperatorTotal);
 	downBy -= 0.25;
 
+	var toShowValue = intPart;
 	if(value - parseInt(value) != 0){
-		value = value.toFixed(2);
+		if(value - intPart > 0.50){
+			toShowValue = (intPart + 0.50).toFixed(2);
+		} else {
+			toShowValue = (intPart)
+		}
 	} 
-	var txtTotal = drawText("Total = Rs." + padWithSpace(" ", value, 3), 0xcdcdcd, 0.14, 0.001, fontGeneral, 0.0, true);
+	var txtTotal = drawText("Total = Rs." + padWithSpace(" ", toShowValue, 3), 0xcdcdcd, 0.14, 0.001, fontGeneral, 0.0, true);
 	txtTotal.position.set(1.53, downBy + 0.05, 0.6);
+	if(value - intPart != 0 && value - intPart != 0.50){
+		let extr;
+		if(value - intPart > 0.50){
+			extr = value - intPart - 0.50;
+		} else {
+			extr = value - intPart;
+		}
+		let leftOver = drawText("(+ " + (extr * 100).toFixed(0) + " paise)", 0xcdcdcd, 0.13, 0.001, fontGeneral, 0.0, true);
+		leftOver.position.set(2.0, downBy - 0.1, 0.6);
+		noteConfCustomGame.add(leftOver);
+	}
 	noteConfCustomGame.add(txtTotal);
 
 	noteConfCustomGame.position.set(0.0, 1.9, 0.6);
@@ -945,7 +976,9 @@ function customNoteScene(){
 	let inputBoxMaterial = new THREE.MeshBasicMaterial({color: 0xffffff, transparent: true});
 	inputBoxMaterial.opacity = 0.7;
 	inputBoxCustomGame = new THREE.Mesh(inputBoxGeometry, inputBoxMaterial);
-	inputBoxCustomGame.position.set(-2.1, 1, 0.5);
+	inputBoxCustomGame.position.set(-2.4, 1, 0.5);
+	inputBoxCustomGame.scale.x = 0.7;
+	inputBoxCustomGame.scale.y = 0.7;
 
 	let configurationButtonText = drawText("SHOW", 0xffffff, 0.15, 0.001, fontCurrency, 0.0, true);
 	let configurationButtonCoverGeometry = new THREE.PlaneGeometry(2, 0.5);
@@ -956,29 +989,31 @@ function customNoteScene(){
 	showConfigurationButton = new THREE.Group();
 	showConfigurationButton.add(elems[0]);
 	showConfigurationButton.add(elems[1]);
-	showConfigurationButton.position.set(-2.1, 0.4, 0.5);
+	showConfigurationButton.position.set(-2.4, 0.6, 0.5);
+	showConfigurationButton.scale.x = 0.7;
+	showConfigurationButton.scale.y = 0.7;
 
 	// PIEremoveElement(textDisplayCustomGame);
 	textInputCustomGame = "";
 	isDecimalEntered = false;
-	textDisplayCustomGame =  drawText(textInputCustomGame + "_", 0x222222, 0.15, 0.001, fontGeneral, 0.0, true);
-	textDisplayCustomGame.position.set(-2.8, 0.9, 0.6);
+	textDisplayCustomGame =  drawText(textInputCustomGame + "_", 0x222222, 0.13, 0.001, fontGeneral, 0.0, true);
+	textDisplayCustomGame.position.set(-2.9, 0.9, 0.6);
 
 	let seperatorGeometry = new THREE.PlaneGeometry(0.03, 4);
 	let seperatorMaterial = new THREE.MeshBasicMaterial({color: 0xffffff, transparent: true});
 	seperatorMaterial.opacity = 0.8;
 	seperatorCustomGame = new THREE.Mesh(seperatorGeometry, seperatorMaterial);
-	seperatorCustomGame.position.set(-0.7, 0, 0.6);
+	seperatorCustomGame.position.set(-1.3, 0, 0.6);
 
-	let infoBoxCustomGame1 = drawText("*(Amount \u2264 1000", 0x19e4e8, 0.12, 0.001, fontGeneral, 0.0, true);
+	let infoBoxCustomGame1 = drawText("*(Amount \u2264 1000)", 0x19e4e8, 0.12, 0.001, fontGeneral, 0.0, true);
 	// let infoBoxCustomGame2 = drawText("Click on the SHOW button", 0x19e4e8, 0.12, 0.001, fontGeneral, 0.0, true);
 	// let infoBoxCustomGame3 = drawText("to see a possible composition", 0x19e4e8, 0.12, 0.001, fontGeneral, 0.0, true);
 	// let infoBoxCustomGame4 = drawText("NOTE: For values after", 0x19e4e8, 0.12, 0.001, fontGeneral, 0.0, true);
-	let infoBoxCustomGame2 = drawText("Use 0.50 for paise after decimal)", 0x19e4e8, 0.12, 0.001, fontGeneral, 0.0, true);
+	// let infoBoxCustomGame2 = drawText("Use 0.50 for paise after decimal)", 0x19e4e8, 0.12, 0.001, fontGeneral, 0.0, true);
 	// let infoBoxCustomGame3 = drawText("for paise after decimal)", 0x19e4e8, 0.12, 0.001, fontGeneral, 0.0, true);
 
 	infoBoxCustomGame1.position.y = 0;
-	infoBoxCustomGame2.position.y = -0.20;
+	// infoBoxCustomGame2.position.y = -0.20;
 	// infoBoxCustomGame3.position.y = -0.40;
 	// infoBoxCustomGame4.position.y = -0.60;
 	// infoBoxCustomGame5.position.y = -0.80;
@@ -986,7 +1021,7 @@ function customNoteScene(){
 
 	infoBoxCustomGame = new THREE.Group();
 	infoBoxCustomGame.add(infoBoxCustomGame1);
-	infoBoxCustomGame.add(infoBoxCustomGame2);
+	// infoBoxCustomGame.add(infoBoxCustomGame2);
 	// infoBoxCustomGame.add(infoBoxCustomGame3);
 	// infoBoxCustomGame.add(infoBoxCustomGame4);
 	// infoBoxCustomGame.add(infoBoxCustomGame5);
@@ -1074,13 +1109,13 @@ function redrawGame2OnSpot(){
 	for(let index = 0; index < tenderVarsGame2.length; ++index){
 		PIEremoveElement(tenderVarsGame2[index]);
 		if(eachValueGame2[index] != 0){
-			if(window.innerWidth < 850){
+			if(window.innerWidth < 640){
 				tenderVarsGame2[index] = showMultiple(tenders[textIndexMapGame2[index]]['img'], eachValueGame2[index], 1.0, 0.01, [0.3, -0.06, 0.01], tenders[textIndexMapGame2[index]]['val']);
 			} else {
 				tenderVarsGame2[index] = showMultiple(tenders[textIndexMapGame2[index]]['img'], eachValueGame2[index], 1.0, 0.01, [0.3, -0.06, 0.01]);
 			}
 		} else {
-			if(window.innerWidth < 850){
+			if(window.innerWidth < 640){
 				tenderVarsGame2[index] = showMultiple(tenders[textIndexMapGame2[index]]['img'], 1, 1.0, 0.01, [0.3, -0.06, 0.01], tenders[textIndexMapGame2[index]]['val']);
 			} else {
 				tenderVarsGame2[index] = showMultiple(tenders[textIndexMapGame2[index]]['img'], 1, 1.0, 0.01, [0.3, -0.06, 0.01]);
@@ -1114,13 +1149,13 @@ function updateTotal(addOrSub, index){
 	// amountIndi.position.set(positionsGame2[index].x, positionsGame2[index].y, positionsGame2[index].z);
 	// indiCountGame2[index] = amountIndi;
 	if(eachValueGame2[index] != 0){
-		if(window.innerWidth < 850){
+		if(window.innerWidth < 640){
 			tenderVarsGame2[index] = showMultiple(tenders[textIndexMapGame2[index]]['img'], eachValueGame2[index], 1.0, 0.01, [0.3, -0.06, 0.01], tenders[textIndexMapGame2[index]]['val']);
 		} else {
 			tenderVarsGame2[index] = showMultiple(tenders[textIndexMapGame2[index]]['img'], eachValueGame2[index], 1.0, 0.01, [0.3, -0.06, 0.01]);
 		}
 	} else {
-		if(window.innerWidth < 850){
+		if(window.innerWidth < 640){
 			tenderVarsGame2[index] = showMultiple(tenders[textIndexMapGame2[index]]['img'], 1, 1.0, 0.01, [0.3, -0.06, 0.01], tenders[textIndexMapGame2[index]]['val']);
 		} else {
 			tenderVarsGame2[index] = showMultiple(tenders[textIndexMapGame2[index]]['img'], 1, 1.0, 0.01, [0.3, -0.06, 0.01]);
@@ -1173,7 +1208,7 @@ function addGame2(){
 		let td = tendersToShow[counter];
 		if(counter >= 4){
 			let tenderClone;
-			if(window.innerWidth <= 850){
+			if(window.innerWidth < 640){
 				tenderClone = showMultiple(tenders[td]['img'], 1, 1.0, 0.01, [0.3, -0.06, 0.01], tenders[textIndexMapGame2[index]]['val']);
 			} else {
 				tenderClone = showMultiple(tenders[td]['img'], 1, 1.0, 0.01, [0.3, -0.06, 0.01]);
@@ -1199,7 +1234,7 @@ function addGame2(){
 			downBy += 0.85;
 		} else{
 			let tenderClone;
-			if(window.innerWidth <= 850){
+			if(window.innerWidth < 640){
 				tenderClone = showMultiple(tenders[td]['img'], 1, 1.0, 0.01, [0.3, -0.06, 0.01], tenders[textIndexMapGame2[index]]['val']);
 			} else {
 				tenderClone = showMultiple(tenders[td]['img'], 1, 1.0, 0.01, [0.3, -0.06, 0.01]);
@@ -1713,19 +1748,25 @@ function removeInvoice(){
 	showingInvoice = false;
 }
 
-function itemForInvoice(index, nameOfItem, quantity, pricePerItem, totalPrice, position, fontSize = 0.15){
+function itemForInvoice(index, nameOfItem, quantity, pricePerItem, totalPrice, position, fontSize = 0.15, shiftVector = [0, 0.55, 2.0, 2.65, 3.7]){
 
 	let indexText = drawText(index, 0x333333, fontSize, 0.001, fontSpecific, 0.0, true);
 	let nameItemText = drawText(nameOfItem, 0x333333, fontSize, 0.001, fontSpecific, 0.0, true);
 	let quantityText = drawText(quantity, 0x333333, fontSize, 0.001, fontSpecific, 0.0, true);
+	if(parseFloat(pricePerItem)){
+		pricePerItem = padWithSpace("  ", pricePerItem, 3)
+	}
 	let perPriceText = drawText(pricePerItem, 0x333333, fontSize, 0.001, fontSpecific, 0.0, true);
+	if(parseFloat(totalPrice)){
+		totalPrice = padWithSpace("  ", totalPrice, 3)
+	}
 	let totalPriceText = drawText(totalPrice, 0x333333, fontSize, 0.001, fontSpecific, 0.0, true);
 
-	indexText.position.set(position[0], position[1], position[2]);
-	nameItemText.position.set(position[0] + 0.55, position[1], position[2]);
-	quantityText.position.set(position[0] + 2.0, position[1], position[2]);
-	perPriceText.position.set(position[0] + 2.9, position[1], position[2]);
-	totalPriceText.position.set(position[0] + 3.7, position[1], position[2]);
+	indexText.position.set(position[0] + shiftVector[0], position[1], position[2]);
+	nameItemText.position.set(position[0] + shiftVector[1], position[1], position[2]);
+	quantityText.position.set(position[0] + shiftVector[2], position[1], position[2]);
+	perPriceText.position.set(position[0] + shiftVector[3], position[1], position[2]);
+	totalPriceText.position.set(position[0] + shiftVector[4], position[1], position[2]);
 
 	let group = new THREE.Group();
 	group.add(indexText);
@@ -1786,8 +1827,8 @@ function handleShowInvoice(){
 	let seperatorPrice = seperatorVert.clone();
 	seperatorPrice.position.x = 1.2;
 
-	let totalDisplay = drawText("Total", 0x333333, 0.15, 0.001, fontSpecific, 0.0, true);
-	totalDisplay.position.set(0.6, -1.8, 3.01);
+	// let totalDisplay = drawText("Total", 0x333333, 0.15, 0.001, fontSpecific, 0.0, true);
+	// totalDisplay.position.set(0.6, -1.8, 3.01);
 	totalAmountNumeric = (priceMap[0] * yourItemsGame3Count[0] +
 						priceMap[1] * yourItemsGame3Count[1] +
 						priceMap[2] * yourItemsGame3Count[2] +
@@ -1797,8 +1838,8 @@ function handleShowInvoice(){
 	if(totalAmountNumeric - parseInt(totalAmountNumeric) != 0){
 		totalAmountNumeric = totalAmountNumeric.toFixed(2);
 	}
-	let totalAmountText = drawText("Rs " + totalAmountNumeric, 0x333333, 0.15, 0.001, fontSpecific, 0.0, true);
-	totalAmountText.position.set(1.3, -1.8, 3.01);
+	// let totalAmountText = drawText("Rs " + totalAmountNumeric, 0x333333, 0.15, 0.001, fontSpecific, 0.0, true);
+	// totalAmountText.position.set(1.3, -1.8, 3.01);
 	let genDate = new Date();
 
 	let dated = drawText("Dated: " + genDate.getDate() + "/" + genDate.getMonth() + "/" + genDate.getFullYear() , 0x333333, 0.09, 0.001, fontSpecific, 0.0, true);
@@ -1806,7 +1847,7 @@ function handleShowInvoice(){
 
 
 
-	let headersForItems = itemForInvoice("SNo", "Item", "Quantity", "Price", "Amount", [-2.45, 1.3, 3.01]); 
+	let headersForItems = itemForInvoice("SNo", "Item", "Quantity", "Price(Rs.)", "Amount(Rs.)", [-2.45, 1.3, 3.01], 0.13, [0, 0.78, 2.0, 2.9, 3.8]); 
 	let itemNames = ['Ball', 'Top', 'Pencil', 'Eraser', 'Candy'];
 	
 	invoice = new THREE.Group();
@@ -1824,7 +1865,7 @@ function handleShowInvoice(){
 			downBy += 0.4;
 		}
 	}
-	
+	let totalItems = itemForInvoice("", "", "", "Total", padWithSpace(" ", totalAmountNumeric, 3), [-2.25, -1.8, 3.01], 0.13, [0, 0.8, 2.0, 2.75, 3.66]);
 	invoice.add(invoiceBox);
 	invoice.add(invoiceCross);
 	invoice.add(textInvoiceHead);
@@ -1836,10 +1877,12 @@ function handleShowInvoice(){
 	invoice.add(seperatorQuantity);
 	invoice.add(seperatorPrice);
 	invoice.add(seperatorTotal);
-	invoice.add(totalDisplay);
-	invoice.add(totalAmountText);
+	// invoice.add(totalDisplay);
+	// invoice.add(totalAmountText);
 	invoice.add(headersForItems);
 	invoice.add(dated);
+	invoice.add(totalItems);
+	
 	invoice.scale.x = 0.85;
 	invoice.scale.y = 0.85;
 	invoice.position.x = -0.7;
