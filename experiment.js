@@ -219,7 +219,7 @@ function showMultiple(obj, count, currentScale = 1.0, reductionFactor = 0.05, in
 	}
 	if(customText){
 		console.log("running show custom text");
-		let customTextDisp = drawText(customText, 0x000000, 0.4 + count * reductionFactor, 0.001, fontGeneral, 0.0, true);
+		let customTextDisp = drawText(customText, 0x000000, 0.35 + count * reductionFactor, 0.001, fontGeneral, 0.0, true);
 		let elem = alignCenter(customTextDisp, objMult);
 		group.add(elem[0]);
 		elem[0].position.z = currentPosition[2] + 0.01;
