@@ -218,6 +218,12 @@ function showMultiple(obj, count, currentScale = 1.0, reductionFactor = 0.05, in
 		console.log(currentPosition);
 	}
 	if(customText){
+		let isNumberCustomText = parseFloat(customText);
+		if(isNumberCustomText){
+			if(parseFloat(customText) - parseInt(customText) > 0){
+				customText = customText.toFixed(2);
+			}
+		}
 		console.log("running show custom text");
 		let customTextDisp = drawText(customText, 0x000000, 0.35 + count * reductionFactor, 0.001, fontGeneral, 0.0, true);
 		let elem = alignCenter(customTextDisp, objMult);
@@ -875,7 +881,7 @@ function handleShowClickCustomGame(){
 		}
 	}
 
-	if(value - parseInt(value) == 0.50){
+	if(value - parseInt(value) >= 0.50){
 		let tndr = tenders['coin50p'];
 		let imagePart;
 		if(window.innerWidth > 640){
@@ -903,16 +909,10 @@ function handleShowClickCustomGame(){
 	noteConfCustomGame.add(seperatorTotal);
 	downBy -= 0.25;
 
-	var toShowValue = intPart;
+	var toShowValue = value;
 	if(value - parseInt(value) != 0){
-		if(value - intPart >= 0.50){
-			toShowValue = (intPart + 0.50).toFixed(2);
-		} else {
-			toShowValue = (intPart)
-		}
+		toShowValue = toShowValue.toFixed(2)
 	} 
-	var txtTotal = drawText("Total = Rs." + padWithSpace(" ", toShowValue, 3), 0xcdcdcd, 0.14, 0.001, fontGeneral, 0.0, true);
-	txtTotal.position.set(1.53, downBy + 0.05, 0.6);
 	if(value - intPart != 0 && value - intPart != 0.50){
 		let extr;
 		if(value - intPart > 0.50){
@@ -921,9 +921,11 @@ function handleShowClickCustomGame(){
 			extr = value - intPart;
 		}
 		let leftOver = drawText("(+ " + (extr * 100).toFixed(0) + " paise)", 0xcdcdcd, 0.13, 0.001, fontGeneral, 0.0, true);
-		leftOver.position.set(2.0, downBy - 0.1, 0.6);
+		leftOver.position.set(2.1, downBy + 0.35, 0.6);
 		noteConfCustomGame.add(leftOver);
 	}
+	var txtTotal = drawText("Total = Rs." + padWithSpace(" ", toShowValue, 3), 0xcdcdcd, 0.14, 0.001, fontGeneral, 0.0, true);
+	txtTotal.position.set(1.53, downBy + 0.05, 0.6);
 	noteConfCustomGame.add(txtTotal);
 
 	noteConfCustomGame.position.set(0.0, 1.9, 0.6);
@@ -1213,7 +1215,7 @@ function addGame2(){
 		if(counter >= 4){
 			let tenderClone;
 			if(window.innerWidth < 640){
-				tenderClone = showMultiple(tenders[td]['img'], 1, 1.0, 0.01, [0.3, -0.06, 0.01], tenders[textIndexMapGame2[index]]['val']);
+				tenderClone = showMultiple(tenders[td]['img'], 1, 1.0, 0.01, [0.3, -0.06, 0.01], textIndexMapGame2[counter]);
 			} else {
 				tenderClone = showMultiple(tenders[td]['img'], 1, 1.0, 0.01, [0.3, -0.06, 0.01]);
 			}
@@ -1239,7 +1241,7 @@ function addGame2(){
 		} else{
 			let tenderClone;
 			if(window.innerWidth < 640){
-				tenderClone = showMultiple(tenders[td]['img'], 1, 1.0, 0.01, [0.3, -0.06, 0.01], tenders[textIndexMapGame2[index]]['val']);
+				tenderClone = showMultiple(tenders[td]['img'], 1, 1.0, 0.01, [0.3, -0.06, 0.01], textIndexMapGame2[counter]);
 			} else {
 				tenderClone = showMultiple(tenders[td]['img'], 1, 1.0, 0.01, [0.3, -0.06, 0.01]);
 			}
