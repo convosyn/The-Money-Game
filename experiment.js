@@ -181,7 +181,7 @@ function deleteVariable(vari){
 	vari = null;
 }
 
-function alignCenter(elem1, elem2){
+function alignCenter(elem1, elem2, vert = true, hor = true){
 
 	elem1Clone = elem1.clone();
 	elem2Clone = elem2.clone();
@@ -194,9 +194,12 @@ function alignCenter(elem1, elem2){
 	
 	let elem2CenterX = (elem2bb.min.x + elem2bb.max.x) / 2;
 	let elem2CenterY = (elem2bb.min.y + elem2bb.max.y) / 2;
-	
-	elem1Clone.translateX(elem2CenterX - elem1CenterX);
-	elem1Clone.translateY(elem2CenterY - elem1CenterY);
+	if(hor == true){
+		elem1Clone.translateX(elem2CenterX - elem1CenterX);
+	}
+	if(vert == true){
+		elem1Clone.translateY(elem2CenterY - elem1CenterY);
+	}
 	
 	return [elem1Clone, elem2Clone];
 }
@@ -225,7 +228,7 @@ function showMultiple(obj, count, currentScale = 1.0, reductionFactor = 0.05, in
 			}
 		}
 		console.log("running show custom text");
-		let customTextDisp = drawText(customText, 0x000000, 0.35 + count * reductionFactor, 0.001, fontGeneral, 0.0, true);
+		let customTextDisp = drawText(customText, 0x000000, 0.35, 0.001, fontGeneral, 0.0, true);
 		let elem = alignCenter(customTextDisp, objMult);
 		group.add(elem[0]);
 		elem[0].position.z = currentPosition[2] + 0.01;
@@ -893,7 +896,7 @@ function handleShowClickCustomGame(){
 		imagePart.scale.y = 0.47;
 		imagePart.position.set(-0.4, downBy, 0.6);
 		let times = drawText("= Rs." + padWithSpace(" ", "0.50", 3), 0xcdcdcd, 0.14, 0.001, fontGeneral, 0.0, true);
-		times.position.set(2.0, downBy - 0.05, 0.6);
+		times.position.set(2.0, downBy - 0.05, 0.6);7
 		let grp = new THREE.Group();
 		grp.add(imagePart);
 		grp.add(times);
@@ -927,8 +930,9 @@ function handleShowClickCustomGame(){
 	var txtTotal = drawText("Total = Rs." + padWithSpace(" ", toShowValue, 3), 0xcdcdcd, 0.14, 0.001, fontGeneral, 0.0, true);
 	txtTotal.position.set(1.53, downBy + 0.05, 0.6);
 	noteConfCustomGame.add(txtTotal);
-
+	
 	noteConfCustomGame.position.set(0.0, 1.9, 0.6);
+	noteConfCustomGame = alignCenter(noteConfCustomGame, board, true, false)[0];
 	PIEaddElement(noteConfCustomGame);
 	handleClickedCustomGameBool = true;
 	PIErender();
@@ -986,7 +990,7 @@ function customNoteScene(){
 	inputBoxCustomGame.scale.x = 0.7;
 	inputBoxCustomGame.scale.y = 0.7;
 
-	let configurationButtonText = drawText("SHOW", 0xffffff, 0.15, 0.001, fontCurrency, 0.0, true);
+	let configurationButtonText = drawText("SHOW", 0xffffff, 0.19, 0.001, fontCurrency, 0.0, true);
 	let configurationButtonCoverGeometry = new THREE.PlaneGeometry(2, 0.5);
 	let configurationButtonMaterial = new THREE.MeshBasicMaterial({color: 0x711c7c});
 	let configurationButtonCover = new THREE.Mesh(configurationButtonCoverGeometry, configurationButtonMaterial);
@@ -1035,7 +1039,7 @@ function customNoteScene(){
 
 	infoBoxCustomGame.position.set(-3.1, -0.5, 0.6);
 
-	writeHereDisplayCustomGame = drawText("*WRITE AMOUNT HERE", 0xbbbbbb, 0.10, 0.001, fontCurrency, 0.0, true);
+	writeHereDisplayCustomGame = drawText("*WRITE AMOUNT HERE", 0xbbbbbb, 0.08, 0.001, fontCurrency, 0.0, true);
 	writeHereDisplayCustomGame.position.set(-3.07, 1.3, 0.6);
 
 	PIEaddElement(textDisplayCustomGame);
@@ -1760,6 +1764,9 @@ function itemForInvoice(index, nameOfItem, quantity, pricePerItem, totalPrice, p
 	let nameItemText = drawText(nameOfItem, 0x333333, fontSize, 0.001, fontSpecific, 0.0, true);
 	let quantityText = drawText(quantity, 0x333333, fontSize, 0.001, fontSpecific, 0.0, true);
 	if(parseFloat(pricePerItem)){
+		if(pricePerItem - parseInt(pricePerItem) != 0){
+			pricePerItem = pricePerItem.toFixed(2);
+		}
 		pricePerItem = padWithSpace("  ", pricePerItem, 3)
 	}
 	let perPriceText = drawText(pricePerItem, 0x333333, fontSize, 0.001, fontSpecific, 0.0, true);
